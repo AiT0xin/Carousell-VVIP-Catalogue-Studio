@@ -105,7 +105,8 @@ class StudioSession:
     qrcheck_done: bool = False
 
     # Shared with catbuilder so fetched profiles/avatars/QRs are reused.
-    cache_dir: Path = Path("/tmp/catbuilder_cache")
+    # Use ~/.cache (user-private) instead of world-readable /tmp
+    cache_dir: Path = Path.home() / ".cache" / "catbuilder"
     output_path: Optional[str] = None
 
     # ── lookups ─────────────────────────────────────────────────────────────

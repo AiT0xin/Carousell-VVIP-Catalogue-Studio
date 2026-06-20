@@ -63,8 +63,9 @@ def _fallback_description(m: MerchantData) -> str:
     listing_titles: list[str] = []
 
     # Try to load listing titles from profile cache
-    cache_file = _P(m.profile_url.replace("https://www.carousell.sg/u/", "").rstrip("/")) if m.profile_url else None
-    profile_json = _P(f"/tmp/catbuilder_cache/profiles/{m.handle}.json")
+    import re as _re
+    safe_handle = _re.sub(r"[^a-zA-Z0-9._-]", "_", m.handle)[:64]
+    profile_json = _P.home() / ".cache" / "catbuilder" / "profiles" / f"{safe_handle}.json"
     if profile_json.exists():
         try:
             data = json.loads(profile_json.read_text())

@@ -28,6 +28,23 @@ _META_RE = re.compile(r"<meta[^>]+>", re.I)
 _CONTENT_RE = re.compile(r'content=["\']([^"\']*)["\']', re.I)
 _TIER_RE = re.compile(r"(Certified Partner|Professional Seller|Verified)", re.I)
 
+_ALLOWED_AVATAR_HOSTS = (
+    "media.karousell.com",
+    "sl3-cdn.karousell.com",
+    "mweb-cdn.karousell.com",
+    "static.carousell.com",
+    "carousell.sg",
+)
+
+def _is_safe_url(url: str) -> bool:
+    """Return True only for https URLs pointing to allowed Carousell CDN hosts."""
+    try:
+        from urllib.parse import urlparse
+        p = urlparse(url)
+        return p.scheme == "https" and any(p.netloc.endswith(h) for h in _ALLOWED_AVATAR_HOSTS)
+    except Exception:
+        return False
+
 
 def _meta(html: str, needle: str) -> str:
     """Return the `content` of the first <meta> tag containing `needle`."""
@@ -65,7 +82,7 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
     if resp.status_code == 404:
         return None
 
-    html = resp.text or ""
+    html = (resp.text or "")[:500_000]  # cap HTML size before regex
     og_title = _meta(html, "og:title")
     if not og_title:
         # No server-rendered profile head → treat as dead/unresolvable.
@@ -92,15 +109,18 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
 
 
 def download_avatar_http(avatar_url: str, handle: str, cache_dir: Path) -> Optional[Path]:
-    if not avatar_url:
+    if not avatar_url or not _is_safe_url(avatar_url):
         return None
+    # Sanitize handle to prevent path traversal in filename
+    safe_handle = re.sub(r"[^a-zA-Z0-9._-]", "_", handle)[:64]
     avatars_dir = Path(cache_dir) / "avatars"
     avatars_dir.mkdir(parents=True, exist_ok=True)
-    out = avatars_dir / f"{handle}.png"
+    out = avatars_dir / f"{safe_handle}.png"
     if out.exists():
         return out
     try:
-        resp = httpx.get(avatar_url, timeout=15, follow_redirects=True, headers={"User-Agent": _UA})
+        resp = httpx.get(avatar_url, timeout=15, follow_redirects=True,
+                         max_redirects=5, headers={"User-Agent": _UA})
         resp.raise_for_status()
         from PIL import Image
         Image.open(io.BytesIO(resp.content)).convert("RGBA").save(out, "PNG")

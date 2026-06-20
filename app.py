@@ -535,9 +535,12 @@ with st.container(border=True):
                                     label_visibility="collapsed")
         new_pdf = None
         if uploaded:
-            tmp = Path("/tmp/studio_upload.pdf")
-            tmp.write_bytes(uploaded.read())
-            new_pdf = str(tmp)
+            import tempfile, os
+            fd, tmp_path = tempfile.mkstemp(suffix=".pdf", prefix="studio_upload_")
+            os.chmod(tmp_path, 0o600)
+            with os.fdopen(fd, "wb") as f:
+                f.write(uploaded.read())
+            new_pdf = tmp_path
         if new_pdf and new_pdf != sess.catalogue_path:
             sess.catalogue_path = new_pdf
             _reset_results()
@@ -550,10 +553,13 @@ with st.container(border=True):
                                      label_visibility="collapsed")
         new_master = None
         if master_up:
+            import tempfile, os
             ext = Path(master_up.name).suffix.lower()
-            tmp = Path(f"/tmp/studio_master{ext}")
-            tmp.write_bytes(master_up.read())
-            new_master = str(tmp)
+            fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="studio_master_")
+            os.chmod(tmp_path, 0o600)
+            with os.fdopen(fd, "wb") as f:
+                f.write(master_up.read())
+            new_master = tmp_path
         if new_master != sess.master_path:
             sess.master_path = new_master
             if sess.crosscheck_done:
@@ -651,7 +657,7 @@ with tab1:
         if err:
             st.error("Cross-check failed.")
             with st.expander("Trace", expanded=True):
-                st.text(err)
+                import re as _re; st.text(_re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err or ""))
         else:
             prog.progress(1.0, text="Cross-check complete ✓")
             import time as _t; _t.sleep(0.5); prog.empty()
@@ -722,7 +728,7 @@ with tab2:
             if err:
                 st.error("QR check failed.")
                 with st.expander("Trace", expanded=True):
-                    st.text(err or "(no traceback captured)")
+                    import re as _re; st.text(_re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err or "(no traceback captured)"))
             else:
                 sess.qrcheck_done = True
                 prog.progress(1.0, text="QR check complete ✅")
@@ -791,7 +797,13 @@ with tab3:
         out_path = st.text_input("Output path", value=sess.output_path or default_out)
 
         if st.button("▶ Generate catalogue", type="primary", key="run_gen"):
-            sess.output_path = out_path
+            # Validate output path: must be absolute and within /tmp or home dir
+            _out = Path(out_path).resolve()
+            _allowed = (Path("/tmp"), Path.home())
+            if not any(str(_out).startswith(str(p)) for p in _allowed):
+                st.error("Output path must be within /tmp or your home directory.")
+                st.stop()
+            sess.output_path = str(_out)
             prog = st.progress(0.0, text="Building…")
             result = None
             err = None
@@ -811,9 +823,14 @@ with tab3:
                 elif kind == "result":
                     result = payload
             if err:
+                import logging
+                logging.error("Generation failed:\n%s", err)
                 st.error("Generation failed.")
-                with st.expander("Trace"):
-                    st.code(err)
+                with st.expander("Trace", expanded=True):
+                    # Strip full file paths from traceback before displaying
+                    import re as _re
+                    safe_err = _re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err)
+                    st.text(safe_err)
             elif result:
                 prog.progress(1.0, text="Done ✅")
                 st.success(f"Built {result['built']} cards → {result['output']}")

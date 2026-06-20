@@ -56,10 +56,16 @@ def _verify_http(url: str) -> dict:
                 return r
         httpx = _compat
 
+    # Validate URL scheme before fetching (prevent file://, data://, etc.)
+    parsed_input = urlparse(url)
+    if parsed_input.scheme not in ("http", "https"):
+        return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": "invalid URL scheme"}
+
     try:
         resp = httpx.get(
             url,
             follow_redirects=True,
+            max_redirects=5,
             timeout=20,
             headers={"User-Agent": _UA},
         )
@@ -67,7 +73,8 @@ def _verify_http(url: str) -> dict:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 
     final_url = str(resp.url)
-    text = resp.text or ""
+    # Limit HTML body size before running regex (prevent ReDoS on pathological input)
+    text = (resp.text or "")[:1_000_000]
 
     # Bounced to homepage → dead
     parsed = urlparse(final_url)
