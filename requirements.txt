@@ -1,0 +1,19 @@
+# UI
+streamlit>=1.30.0
+pandas>=2.0.0
+# QR + PDF extraction (Feature 1 & 2)
+pyzbar>=0.1.9
+opencv-python>=4.8.0
+pdfplumber>=0.10.0
+pypdfium2>=4.20.0
+numpy>=1.24.0
+# Live verification (Feature 2)
+playwright>=1.40.0
+# Generation (Feature 3)
+reportlab>=4.1.0
+qrcode[pil]>=7.4.2
+Pillow>=10.0.0
+openpyxl>=3.1.0
+anthropic>=0.25.0
+requests>=2.31.0
+httpx>=0.25.0
