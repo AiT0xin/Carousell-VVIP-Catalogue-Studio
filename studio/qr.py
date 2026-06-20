@@ -105,13 +105,13 @@ def _handle_from_url(url: str) -> str:
 def _http_verify(url: str) -> dict:
     try:
         import httpx
-        resp = httpx.get(url, follow_redirects=True, timeout=20,
+        resp = httpx.get(url, follow_redirects=True, max_redirects=5, timeout=20,
                          headers={"User-Agent": _UA})
     except Exception as e:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 
     final_url = str(resp.url)
-    text = resp.text or ""
+    text = (resp.text or "")[:1_000_000]  # cap before regex
     parsed = urlparse(final_url)
 
     if parsed.path in ("", "/") and "carousell" in parsed.netloc.lower():

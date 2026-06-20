@@ -793,7 +793,9 @@ with tab3:
         if not have_key:
             st.caption("⚠ No API key found — cards will use a generic description.")
 
-        default_out = f"/tmp/{Path(sess.catalogue_path).stem}_corrected.pdf"
+        import re as _re
+        _stem = _re.sub(r"[^a-zA-Z0-9._-]", "_", Path(sess.catalogue_path).stem)[:80]
+        default_out = f"/tmp/{_stem}_corrected.pdf"
         out_path = st.text_input("Output path", value=sess.output_path or default_out)
 
         if st.button("▶ Generate catalogue", type="primary", key="run_gen"):

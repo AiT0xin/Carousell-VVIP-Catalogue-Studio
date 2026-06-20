@@ -75,7 +75,7 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
 
     url = f"https://www.carousell.sg/u/{handle}/"
     try:
-        resp = httpx.get(url, follow_redirects=True, timeout=20, headers={"User-Agent": _UA})
+        resp = httpx.get(url, follow_redirects=True, max_redirects=5, timeout=20, headers={"User-Agent": _UA})
     except Exception:
         return None
 
