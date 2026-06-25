@@ -438,8 +438,21 @@ textarea:focus {
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-  background: var(--canvas) !important;
+  background: var(--surface-soft) !important;
   border-right: 1px solid var(--border-soft) !important;
+}
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+  background: var(--canvas) !important;
+  border: 1.5px dashed var(--border) !important;
+  padding: 16px !important;
+}
+[data-testid="stSidebar"] label {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+}
+[data-testid="stSidebar"] [data-testid="stSelectbox"] [data-baseweb="select"] > div {
+  background: var(--canvas) !important;
 }
 
 /* ── Expander (accordion) ── */
@@ -619,99 +632,101 @@ def _reset_results():
     sess.output_path = None
 
 
-# ── Header ─────────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="carousell-hero">
-  <div class="carousell-hero-inner">
-    <svg class="carousell-logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="10" width="88" height="86" rx="18" ry="18" fill="black"/>
-      <rect x="64" y="4" width="24" height="20" rx="7" ry="7" fill="black"/>
+# ── Sidebar: setup panel ────────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("""
+<div style="padding:8px 0 24px 0;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+    <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="10" width="88" height="86" rx="18" ry="18" fill="#ff385c"/>
+      <rect x="64" y="4" width="24" height="20" rx="7" ry="7" fill="#ff385c"/>
       <path d="M54 26 A24 24 0 1 0 54 74 L47 65 A13 13 0 1 1 47 35 Z" fill="white"/>
       <circle cx="65" cy="38" r="8.5" fill="white"/>
       <circle cx="65" cy="61" r="7" fill="white"/>
     </svg>
-    <div class="carousell-hero-text">
-      <div class="hero-eyebrow">Carousell VVIP Tools</div>
-      <h1>Catalogue Studio
-        <span class="hero-badge">BETA</span>
-      </h1>
-      <p>Cross-check VVIPs &nbsp;&middot;&nbsp; Verify QR codes &nbsp;&middot;&nbsp; Generate corrected catalogue</p>
-      <p class="carousell-experiment">An Owin &times; Claude Code experiment</p>
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;line-height:1;">VVIP Tools</div>
+      <div style="font-size:18px;font-weight:700;color:#222222;line-height:1.3;margin-top:2px;">Catalogue Studio</div>
     </div>
   </div>
+  <div style="font-size:11px;color:#929292;font-style:italic;margin-top:8px;">An Owin × Claude Code experiment</div>
 </div>
 """, unsafe_allow_html=True)
 
-with st.container(border=True):
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("**📄 Catalogue PDF**")
-        uploaded = st.file_uploader("Upload catalogue", type=["pdf"],
-                                    label_visibility="collapsed")
-        new_pdf = None
-        if uploaded:
-            import tempfile, os
-            fd, tmp_path = tempfile.mkstemp(suffix=".pdf", prefix="studio_upload_")
-            os.chmod(tmp_path, 0o600)
-            with os.fdopen(fd, "wb") as f:
-                f.write(uploaded.read())
-            new_pdf = tmp_path
-        if new_pdf and new_pdf != sess.catalogue_path:
-            sess.catalogue_path = new_pdf
+    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;margin-bottom:8px;">1 — Upload Files</div>', unsafe_allow_html=True)
+
+    uploaded = st.file_uploader("Catalogue PDF", type=["pdf"])
+    new_pdf = None
+    if uploaded:
+        import tempfile, os
+        fd, tmp_path = tempfile.mkstemp(suffix=".pdf", prefix="studio_upload_")
+        os.chmod(tmp_path, 0o600)
+        with os.fdopen(fd, "wb") as f:
+            f.write(uploaded.read())
+        new_pdf = tmp_path
+    if new_pdf and new_pdf != sess.catalogue_path:
+        sess.catalogue_path = new_pdf
+        _reset_results()
+
+    master_up = st.file_uploader("VVIP Master Sheet", type=["xlsx", "csv"])
+    new_master = None
+    if master_up:
+        import tempfile, os
+        ext = Path(master_up.name).suffix.lower()
+        fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="studio_master_")
+        os.chmod(tmp_path, 0o600)
+        with os.fdopen(fd, "wb") as f:
+            f.write(master_up.read())
+        new_master = tmp_path
+    if new_master != sess.master_path:
+        sess.master_path = new_master
+        if sess.crosscheck_done:
             _reset_results()
-        if sess.catalogue_path:
-            st.caption(f"📄 {Path(sess.catalogue_path).name}")
 
-    with c2:
-        st.markdown("**📊 VVIP Master Sheet**")
-        master_up = st.file_uploader("Upload master xlsx or csv", type=["xlsx", "csv"],
-                                     label_visibility="collapsed")
-        new_master = None
-        if master_up:
-            import tempfile, os
-            ext = Path(master_up.name).suffix.lower()
-            fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="studio_master_")
-            os.chmod(tmp_path, 0o600)
-            with os.fdopen(fd, "wb") as f:
-                f.write(master_up.read())
-            new_master = tmp_path
-        if new_master != sess.master_path:
-            sess.master_path = new_master
-            if sess.crosscheck_done:
-                _reset_results()
-        if sess.master_path:
-            st.caption(f"📊 {Path(sess.master_path).name}")
-        _CATEGORIES = ["Autos", "Services", "Luxury", "Goods"]
-        _CAT_OPTIONS = ["Select Category"] + _CATEGORIES
-        # Default to index 0 (Select Category); if sess.category is set, find it in _CATEGORIES and add 1 for the placeholder
-        current_idx = 0
-        if sess.category in _CATEGORIES:
-            current_idx = _CATEGORIES.index(sess.category) + 1
-        cat = st.selectbox(
-            "Category (sheet)",
-            _CAT_OPTIONS,
-            index=current_idx,
-        )
-        if cat != "Select Category" and cat != sess.category:
-            sess.category = cat
-        elif cat == "Select Category":
-            sess.category = ""
+    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;margin:20px 0 8px 0;">2 — Select Category</div>', unsafe_allow_html=True)
 
-# --- TEMP DEMO AUTOLOAD (revert after screenshots) ---
-if Path("/tmp/studio_demo_autoload").exists():
-    if not sess.catalogue_path and Path("/tmp/studio_upload.pdf").exists():
-        sess.catalogue_path = "/tmp/studio_upload.pdf"
-    if not sess.master_path and Path("/tmp/studio_master.xlsx").exists():
-        sess.master_path = "/tmp/studio_master.xlsx"
-# --- END TEMP DEMO AUTOLOAD ---
+    _CATEGORIES = ["Autos", "Services", "Luxury", "Goods"]
+    _CAT_OPTIONS = ["Select Category"] + _CATEGORIES
+    current_idx = 0
+    if sess.category in _CATEGORIES:
+        current_idx = _CATEGORIES.index(sess.category) + 1
+    cat = st.selectbox("Category (sheet)", _CAT_OPTIONS, index=current_idx, label_visibility="collapsed")
+    if cat != "Select Category" and cat != sess.category:
+        sess.category = cat
+    elif cat == "Select Category":
+        sess.category = ""
 
+    st.divider()
+
+    # Status summary
+    def _status_dot(ok: bool) -> str:
+        return "🟢" if ok else "⚪"
+
+    st.markdown(f"""
+<div style="font-size:12px;color:#6a6a6a;line-height:2;">
+  {_status_dot(bool(sess.catalogue_path))} Catalogue PDF<br>
+  {_status_dot(bool(sess.master_path))} Master Sheet<br>
+  {_status_dot(bool(sess.category))} Category selected<br>
+  {_status_dot(sess.crosscheck_done)} Cross-check done<br>
+  {_status_dot(sess.qrcheck_done)} QR check done
+</div>
+""", unsafe_allow_html=True)
+
+# ── Main workspace ──────────────────────────────────────────────────────────
 ready = bool(sess.catalogue_path and sess.master_path)
+
 if not ready:
-    st.info("Load a catalogue PDF and the VVIP master sheet above to get started.")
     st.markdown("""
-    <style>
-    [data-testid="stTabs"] { opacity: 0.45; pointer-events: none; user-select: none; }
-    </style>
+<div style="text-align:center;padding:80px 40px;">
+  <div style="font-size:48px;margin-bottom:16px;">🗂️</div>
+  <div style="font-size:22px;font-weight:600;color:#222222;margin-bottom:8px;">Ready to get started</div>
+  <div style="font-size:15px;color:#6a6a6a;max-width:400px;margin:0 auto;">
+    Upload your catalogue PDF and VVIP master sheet in the sidebar to unlock the tools below.
+  </div>
+</div>
+""", unsafe_allow_html=True)
+    st.markdown("""
+    <style>[data-testid="stTabs"] { opacity: 0.45; pointer-events: none; user-select: none; }</style>
     """, unsafe_allow_html=True)
 
 tab1, tab2, tab3 = st.tabs(["① Cross-check", "② QR Check", "③ Generate"])
