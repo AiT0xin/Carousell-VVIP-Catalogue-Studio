@@ -70,7 +70,7 @@ html, body, .stApp,
 [data-testid="stText"] *,
 [class*="stFileUploaderFileName"],
 [class*="stFileUploaderFileData"] * {
-  color: var(--text) !important;
+  color: var(--ink) !important;
 }
 
 /* Re-whiten the hero banner (more specific → wins) */
@@ -80,7 +80,7 @@ html, body, .stApp,
   color: #fff !important;
 }
 .carousell-logo {
-  color: var(--red) !important;
+  color: var(--primary) !important;
   background: #fff !important;
 }
 
