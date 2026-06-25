@@ -474,31 +474,32 @@ pre code, pre span {
   background: transparent !important;
 }
 
-/* ── Hero banner (clean gradient, Rausch primary) ── */
+/* ── Hero banner ── */
 .carousell-hero {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-active) 100%);
-  border-radius: 16px;
-  padding: 48px 40px;
+  background: linear-gradient(135deg, #ff385c 0%, #c9113a 100%);
+  border-radius: 20px;
+  padding: 40px 48px;
   margin-bottom: 32px;
   color: white;
+  position: relative;
+  overflow: hidden;
 }
-.carousell-hero h1 {
-  color: #ffffff !important;
-  font-size: 28px !important;
-  font-weight: 700 !important;
-  line-height: 1.43 !important;
-  margin: 0 0 12px 0 !important;
-}
-.carousell-hero p {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-size: 16px !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
+/* subtle radial glow top-right */
+.carousell-hero::after {
+  content: "";
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
 }
 .carousell-hero-inner {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
 }
 .carousell-logo-icon {
   flex-shrink: 0;
@@ -506,16 +507,47 @@ pre code, pre span {
   height: 64px;
 }
 .carousell-hero-text { flex: 1; }
-.carousell-experiment {
-  margin-top: 8px !important;
-  font-size: 0.82em !important;
-  font-style: italic !important;
-  color: #ff9999 !important;
-  font-weight: 600 !important;
-  opacity: 0.9 !important;
+.hero-eyebrow {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.32px !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  margin-bottom: 8px !important;
 }
-@keyframes rainbow { 0%{background-position:0%} 100%{background-position:300%} }
-
+.carousell-hero h1 {
+  color: #ffffff !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin: 0 0 10px 0 !important;
+  letter-spacing: -0.02em !important;
+}
+.hero-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.32px !important;
+  text-transform: uppercase !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 20px !important;
+  padding: 3px 10px !important;
+  vertical-align: middle !important;
+  margin-left: 10px !important;
+}
+.carousell-hero p {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  margin: 0 0 4px 0 !important;
+}
+.carousell-experiment {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  font-style: italic !important;
+  color: rgba(255, 200, 200, 0.8) !important;
+  margin-top: 10px !important;
+}
 /* ── Tables: fixed height, no resize handle ── */
 [data-testid="stDataFrame"] > div,
 [data-testid="stDataEditor"] > div {
@@ -587,24 +619,23 @@ def _reset_results():
     sess.output_path = None
 
 
-# ── Header + setup ──────────────────────────────────────────────────────────
+# ── Header ─────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="carousell-hero">
   <div class="carousell-hero-inner">
     <svg class="carousell-logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <!-- Rounded square body (black) -->
       <rect x="4" y="10" width="88" height="86" rx="18" ry="18" fill="black"/>
-      <!-- Small bump top-right -->
       <rect x="64" y="4" width="24" height="20" rx="7" ry="7" fill="black"/>
-      <!-- C shape in white -->
       <path d="M54 26 A24 24 0 1 0 54 74 L47 65 A13 13 0 1 1 47 35 Z" fill="white"/>
-      <!-- Two dots in white -->
       <circle cx="65" cy="38" r="8.5" fill="white"/>
       <circle cx="65" cy="61" r="7" fill="white"/>
     </svg>
     <div class="carousell-hero-text">
-      <h1>VVIP Catalogue Studio <span style="font-size:0.42em;font-weight:600;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.4);border-radius:6px;padding:3px 10px;vertical-align:middle;letter-spacing:0.05em;">BETA</span></h1>
-      <p>Cross-check VVIPs &nbsp;·&nbsp; verify QR codes &nbsp;·&nbsp; generate the corrected catalogue <span style="font-size:0.6em;font-weight:500;opacity:0.8;">(beta)</span></p>
+      <div class="hero-eyebrow">Carousell VVIP Tools</div>
+      <h1>Catalogue Studio
+        <span class="hero-badge">BETA</span>
+      </h1>
+      <p>Cross-check VVIPs &nbsp;&middot;&nbsp; Verify QR codes &nbsp;&middot;&nbsp; Generate corrected catalogue</p>
       <p class="carousell-experiment">An Owin &times; Claude Code experiment</p>
     </div>
   </div>
@@ -614,7 +645,7 @@ st.markdown("""
 with st.container(border=True):
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("##### 📄 Catalogue PDF")
+        st.markdown("**📄 Catalogue PDF**")
         uploaded = st.file_uploader("Upload catalogue", type=["pdf"],
                                     label_visibility="collapsed")
         new_pdf = None
@@ -632,7 +663,7 @@ with st.container(border=True):
             st.caption(f"📄 {Path(sess.catalogue_path).name}")
 
     with c2:
-        st.markdown("##### 📊 VVIP Master")
+        st.markdown("**📊 VVIP Master Sheet**")
         master_up = st.file_uploader("Upload master xlsx or csv", type=["xlsx", "csv"],
                                      label_visibility="collapsed")
         new_master = None
