@@ -31,10 +31,14 @@ PROJECT_ROOT = Path(__file__).parent
 st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide", page_icon="🗂️")
 
 # ── Airbnb-inspired design system ────────────────────────────────────────────
+st.markdown(
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">',
+    unsafe_allow_html=True,
+)
+
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ── Colour tokens ── */
 :root {
