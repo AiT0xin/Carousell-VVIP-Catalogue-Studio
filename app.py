@@ -32,8 +32,11 @@ st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide", page_icon=
 
 # ── Airbnb-inspired design system ────────────────────────────────────────────
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Colour tokens (Airbnb system) ── */
+/* ── Colour tokens ── */
 :root {
   --primary:        #ff385c;
   --primary-active: #e00b41;
@@ -51,10 +54,7 @@ st.markdown("""
 }
 
 /* ── Global typography & appearance ── */
-html, body, .stApp,
-[data-testid="stAppViewContainer"],
-[data-testid="stAppViewContainer"] > section,
-[data-testid="stAppViewContainer"] > section > div {
+html, body, .stApp, * {
   font-family: "Inter", "-apple-system", "system-ui", "Roboto", "Helvetica Neue", sans-serif !important;
   background-color: var(--canvas) !important;
   color: var(--ink) !important;
@@ -653,7 +653,7 @@ with st.sidebar:
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;margin-bottom:8px;">1 — Upload Files</div>', unsafe_allow_html=True)
+    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;margin-bottom:8px;">Step 1 — Upload Files</div>', unsafe_allow_html=True)
 
     uploaded = st.file_uploader("Catalogue PDF", type=["pdf"])
     new_pdf = None
@@ -698,30 +698,54 @@ with st.sidebar:
 
     st.divider()
 
-    # Status summary
-    def _status_dot(ok: bool) -> str:
-        return "🟢" if ok else "⚪"
+    # Status panel
+    def _pill(ok: bool, label: str) -> str:
+        if ok:
+            return f'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size:13px;color:#222;font-weight:500;">{label}</span></div>'
+        return f'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg><span style="font-size:13px;color:#929292;">{label}</span></div>'
 
-    st.markdown(f"""
-<div style="font-size:12px;color:#6a6a6a;line-height:2;">
-  {_status_dot(bool(sess.catalogue_path))} Catalogue PDF<br>
-  {_status_dot(bool(sess.master_path))} Master Sheet<br>
-  {_status_dot(bool(sess.category))} Category selected<br>
-  {_status_dot(sess.crosscheck_done)} Cross-check done<br>
-  {_status_dot(sess.qrcheck_done)} QR check done
-</div>
-""", unsafe_allow_html=True)
+    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#929292;margin-bottom:8px;">Session Status</div>', unsafe_allow_html=True)
+    st.markdown(
+        _pill(bool(sess.catalogue_path), "Catalogue PDF") +
+        _pill(bool(sess.master_path), "Master Sheet") +
+        _pill(bool(sess.category), "Category selected") +
+        _pill(sess.crosscheck_done, "Cross-check done") +
+        _pill(sess.qrcheck_done, "QR check done"),
+        unsafe_allow_html=True
+    )
 
 # ── Main workspace ──────────────────────────────────────────────────────────
 ready = bool(sess.catalogue_path and sess.master_path)
 
 if not ready:
     st.markdown("""
-<div style="text-align:center;padding:80px 40px;">
-  <div style="font-size:48px;margin-bottom:16px;">🗂️</div>
-  <div style="font-size:22px;font-weight:600;color:#222222;margin-bottom:8px;">Ready to get started</div>
-  <div style="font-size:15px;color:#6a6a6a;max-width:400px;margin:0 auto;">
-    Upload your catalogue PDF and VVIP master sheet in the sidebar to unlock the tools below.
+<div style="text-align:center;padding:80px 40px 60px;">
+  <div style="width:56px;height:56px;margin:0 auto 20px;background:#fff0f3;border-radius:14px;display:flex;align-items:center;justify-content:center;">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff385c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+  </div>
+  <div style="font-size:20px;font-weight:600;color:#222222;margin-bottom:8px;letter-spacing:-0.02em;">Upload files to get started</div>
+  <div style="font-size:14px;color:#6a6a6a;max-width:360px;margin:0 auto;line-height:1.6;">
+    Add your catalogue PDF and VVIP master sheet in the sidebar — then run cross-check, QR verification, or generate a corrected catalogue.
+  </div>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;">
+    <div style="background:#f7f7f7;border-radius:10px;padding:12px 16px;font-size:13px;color:#6a6a6a;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff385c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Cross-check VVIPs
+    </div>
+    <div style="background:#f7f7f7;border-radius:10px;padding:12px 16px;font-size:13px;color:#6a6a6a;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff385c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7z"/><path d="M14 7h3v3h-3z"/><path d="M7 14h3v3H7z"/><rect x="14" y="14" width="3" height="3"/></svg>
+      Verify QR codes
+    </div>
+    <div style="background:#f7f7f7;border-radius:10px;padding:12px 16px;font-size:13px;color:#6a6a6a;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff385c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Generate catalogue
+    </div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -729,7 +753,7 @@ if not ready:
     <style>[data-testid="stTabs"] { opacity: 0.45; pointer-events: none; user-select: none; }</style>
     """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["① Cross-check", "② QR Check", "③ Generate"])
+tab1, tab2, tab3 = st.tabs(["Cross-check", "QR Check", "Generate"])
 
 
 # ── Helper: approval editor ─────────────────────────────────────────────────
