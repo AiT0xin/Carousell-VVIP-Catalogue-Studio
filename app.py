@@ -30,28 +30,35 @@ PROJECT_ROOT = Path(__file__).parent
 
 st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide", page_icon="🗂️")
 
-# ── Carousell design language ────────────────────────────────────────────────
+# ── Airbnb-inspired design system ────────────────────────────────────────────
 st.markdown("""
 <style>
-/* ── Brand colours ── */
+/* ── Colour tokens (Airbnb system) ── */
 :root {
-  --red:    #EE3422;
-  --red-dk: #C4200F;
-  --blue:   #1A56DB;
-  --grey:   #F4F5F7;
-  --border: #E5E7EB;
-  --text:   #111827;
-  --muted:  #6B7280;
+  --primary:        #ff385c;
+  --primary-active: #e00b41;
+  --ink:            #222222;
+  --body:           #3f3f3f;
+  --muted:          #6a6a6a;
+  --muted-soft:     #929292;
+  --canvas:         #ffffff;
+  --surface-soft:   #f7f7f7;
+  --surface-card:   #ffffff;
+  --border:         #dddddd;
+  --border-soft:    #ebebeb;
+  --error:          #c13515;
+  --blue:           #428bff;
 }
 
-/* ── Global font & background — kill dark-theme root ── */
+/* ── Global typography & appearance ── */
 html, body, .stApp,
 [data-testid="stAppViewContainer"],
 [data-testid="stAppViewContainer"] > section,
 [data-testid="stAppViewContainer"] > section > div {
-  font-family: "Inter", "Helvetica Neue", Arial, sans-serif !important;
-  background-color: #F8F9FA !important;
-  color: var(--text) !important;
+  font-family: "Inter", "-apple-system", "system-ui", "Roboto", "Helvetica Neue", sans-serif !important;
+  background-color: var(--canvas) !important;
+  color: var(--ink) !important;
+  line-height: 1.5 !important;
 }
 
 /* All widget labels, captions, paragraphs → dark */
@@ -85,217 +92,275 @@ html, body, .stApp,
   padding-top: 0 !important;
 }
 
-/* ── Title & caption (inside the red banner) ── */
+/* ── Heading hierarchy (modest weights) ── */
 [data-testid="stAppViewContainer"] h1 {
-  font-size: 2rem !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.02em !important;
-  color: var(--text) !important;
-}
-
-/* ── Subheaders ── */
-h2, h3, [data-testid="stMarkdownContainer"] h3 {
+  font-size: 28px !important;
   font-weight: 700 !important;
-  color: var(--text) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.43 !important;
+  color: var(--ink) !important;
 }
 
-/* ── Tabs: Carousell pill style ── */
+h2, [data-testid="stMarkdownContainer"] h2 {
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  line-height: 1.18 !important;
+  color: var(--ink) !important;
+}
+
+h3, [data-testid="stMarkdownContainer"] h3 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: var(--ink) !important;
+}
+
+/* ── Tabs (clean underline style) ── */
 [data-testid="stTabs"] [role="tablist"] {
-  gap: 4px;
-  border-bottom: 2px solid var(--border) !important;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-soft) !important;
   padding-bottom: 0;
 }
 [data-testid="stTabs"] [role="tab"] {
   font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 10px 20px !important;
-  border-radius: 8px 8px 0 0 !important;
+  font-size: 16px !important;
+  padding: 12px 0 !important;
   color: var(--muted) !important;
   background: transparent !important;
   border: none !important;
+  border-bottom: 2px solid transparent !important;
 }
 [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
-  color: var(--red) !important;
-  border-bottom: 3px solid var(--red) !important;
+  color: var(--ink) !important;
+  border-bottom: 2px solid var(--primary) !important;
   background: transparent !important;
 }
 
-/* ── Primary buttons → Carousell red ── */
+/* ── Primary buttons (Rausch) ── */
 [data-testid="stButton"] button[kind="primary"],
 button[data-testid="baseButton-primary"] {
-  background: var(--red) !important;
-  color: #fff !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
   border: none !important;
   border-radius: 8px !important;
-  font-weight: 700 !important;
-  font-size: 0.9rem !important;
-  padding: 10px 24px !important;
-  transition: background 0.15s ease, transform 0.1s ease !important;
-  box-shadow: 0 2px 6px rgba(238,52,34,0.25) !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  padding: 14px 24px !important;
+  height: 48px !important;
+  transition: background 0.2s ease !important;
 }
-[data-testid="stButton"] button[kind="primary"]:hover,
-button[data-testid="baseButton-primary"]:hover {
-  background: var(--red-dk) !important;
-  transform: translateY(-1px) !important;
+[data-testid="stButton"] button[kind="primary"]:hover {
+  background: var(--primary-active) !important;
 }
 
-/* ── Secondary/default buttons ── */
+[data-testid="stButton"] button[kind="primary"]:focus-visible {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── Secondary buttons (outline) ── */
 [data-testid="stButton"] button[kind="secondary"],
 button[data-testid="baseButton-secondary"] {
-  border: 2px solid var(--red) !important;
-  color: var(--red) !important;
-  background: #fff !important;
+  border: 1.5px solid var(--primary) !important;
+  color: var(--primary) !important;
+  background: var(--canvas) !important;
   border-radius: 8px !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+  padding: 13px 23px !important;
+  height: 48px !important;
 }
 
 /* ── Download button ── */
 [data-testid="stDownloadButton"] button {
-  background: var(--red) !important;
-  color: #fff !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
   border: none !important;
   border-radius: 8px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 6px rgba(238,52,34,0.25) !important;
+  font-weight: 500 !important;
+  transition: background 0.2s ease !important;
+}
+[data-testid="stDownloadButton"] button:hover {
+  background: var(--primary-active) !important;
 }
 
-/* ── Metric cards ── */
+/* ── Metric cards (simple, clean) ── */
 [data-testid="stMetric"] {
-  background: #fff !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 12px !important;
-  padding: 16px 20px !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+  background: var(--canvas) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 14px !important;
+  padding: 24px !important;
+  box-shadow: none !important;
 }
 [data-testid="stMetricLabel"] {
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.32px !important;
   color: var(--muted) !important;
+  margin-bottom: 8px !important;
 }
 [data-testid="stMetricValue"] {
-  font-size: 1.75rem !important;
-  font-weight: 800 !important;
-  color: var(--text) !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  color: var(--ink) !important;
 }
 
-/* ── Container / card borders ── */
+/* ── Cards (soft shadows, generous padding) ── */
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] > div {
-  border-radius: 16px !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-  background: #fff !important;
-  padding: 20px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border-soft) !important;
+  background: var(--canvas) !important;
+  padding: 24px !important;
+  box-shadow: rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.1) 0 4px 8px !important;
+  transition: box-shadow 0.2s ease !important;
+}
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] > div:hover {
+  box-shadow: rgba(0,0,0,0.04) 0 0 0 1px, rgba(0,0,0,0.08) 0 4px 12px, rgba(0,0,0,0.15) 0 6px 16px !important;
 }
 
-/* ── Info / success / warning banners ── */
+/* ── Info / success / warning alerts ── */
 [data-testid="stAlert"][data-baseweb="notification"][aria-label="Info"] {
   border-left: 4px solid var(--blue) !important;
   border-radius: 10px !important;
-  background: #EFF6FF !important;
+  background: #eff6ff !important;
+  color: var(--ink) !important;
 }
 [data-testid="stAlert"][data-baseweb="notification"][aria-label="Success"] {
-  border-left: 4px solid #16A34A !important;
+  border-left: 4px solid #16a34a !important;
   border-radius: 10px !important;
-  background: #F0FDF4 !important;
+  background: #f0fdf4 !important;
+  color: var(--ink) !important;
+}
+[data-testid="stAlert"][data-baseweb="notification"][aria-label="Warning"] {
+  border-left: 4px solid #ca8a04 !important;
+  border-radius: 10px !important;
+  background: #fefce8 !important;
+  color: var(--ink) !important;
+}
+[data-testid="stAlert"][data-baseweb="notification"][aria-label="Error"] {
+  border-left: 4px solid var(--error) !important;
+  border-radius: 10px !important;
+  background: #fee2e2 !important;
+  color: var(--error) !important;
 }
 
-/* ── Cream palette for all form controls ── */
+/* ── Form controls (clean, minimal) ── */
 
 /* Text inputs */
 [data-testid="stTextInput"] input {
-  background: #FFFBF8 !important;
-  color: var(--text) !important;
+  background: var(--canvas) !important;
+  color: var(--ink) !important;
   border-radius: 8px !important;
-  border: 1.5px solid #F0E8E4 !important;
-  font-size: 0.9rem !important;
+  border: 1px solid var(--border) !important;
+  font-size: 16px !important;
+  padding: 14px 12px !important;
+  height: 56px !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
-[data-testid="stTextInput"] input:focus {
-  border-color: var(--red) !important;
-  box-shadow: 0 0 0 3px rgba(238,52,34,0.10) !important;
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextInput"] input:focus-visible {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1) !important;
+}
+[data-testid="stTextInput"] input::placeholder {
+  color: var(--muted-soft) !important;
 }
 
-/* Selectbox — all layers need explicit light colours */
+/* Selectbox (clean styling) */
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stSelectbox"] [data-baseweb="select"] > div,
 [data-testid="stSelectbox"] [data-baseweb="select"] div {
-  background: #FFFBF8 !important;
-  border-color: #F0E8E4 !important;
-  color: var(--text) !important;
+  background: var(--canvas) !important;
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
 }
 [data-testid="stSelectbox"] [data-baseweb="select"] > div {
-  border: 1.5px solid #F0E8E4 !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
+  min-height: 56px !important;
 }
 [data-testid="stSelectbox"] [data-baseweb="select"] > div:focus-within {
-  border-color: var(--red) !important;
-  box-shadow: 0 0 0 3px rgba(238,52,34,0.10) !important;
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1) !important;
 }
-/* The actual selected value text and placeholder */
+
+/* Select text + placeholder */
 [data-testid="stSelectbox"] [data-baseweb="select"] span,
 [data-testid="stSelectbox"] [data-baseweb="select"] input,
 [data-testid="stSelectbox"] [data-baseweb="select"] [class*="placeholder"],
 [data-testid="stSelectbox"] [data-baseweb="select"] [class*="singleValue"],
 [data-testid="stSelectbox"] [data-baseweb="select"] [class*="value"] {
-  color: var(--text) !important;
+  color: var(--ink) !important;
 }
-/* Dropdown arrow icon */
+[data-testid="stSelectbox"] [data-baseweb="select"] [class*="placeholder"] {
+  color: var(--muted-soft) !important;
+}
+
+/* Dropdown arrow */
 [data-testid="stSelectbox"] [data-baseweb="select"] svg {
   fill: var(--muted) !important;
 }
-/* Dropdown popover — hardcoded colours, no CSS vars (portal is outside :root scope) */
+
+/* Dropdown menu (portal) */
 [data-baseweb="popover"],
 [data-baseweb="popover"] > div,
 [data-baseweb="menu"],
 [data-baseweb="menu"] ul {
-  background: #FFFBF8 !important;
-  border: 1px solid #F0E8E4 !important;
+  background: var(--canvas) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 [data-baseweb="menu"] li,
 [data-baseweb="option"],
 [role="option"],
 [role="listbox"] > * {
-  background: #FFFBF8 !important;
-  color: #111827 !important;
+  background: var(--canvas) !important;
+  color: var(--ink) !important;
+  padding: 12px 16px !important;
 }
 [data-baseweb="option"] *,
 [role="option"] * {
-  color: #111827 !important;
+  color: var(--ink) !important;
 }
 [data-baseweb="option"]:hover,
 [role="option"]:hover,
 [data-baseweb="option"]:hover * {
-  background: #FFF0ED !important;
-  color: #111827 !important;
+  background: var(--surface-soft) !important;
+  color: var(--ink) !important;
 }
 [data-baseweb="option"][aria-selected="true"],
 [role="option"][aria-selected="true"] {
-  background: #FFE8E5 !important;
-  color: #EE3422 !important;
+  background: #f7f7f7 !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
 }
 [data-baseweb="option"][aria-selected="true"] *,
 [role="option"][aria-selected="true"] * {
-  color: #EE3422 !important;
+  color: var(--primary) !important;
 }
 
-/* File uploader — kill the dark outer shell first */
+/* File uploader (simple, clean) */
 [data-testid="stFileUploader"] > section,
 [data-testid="stFileUploader"] > div,
 [data-testid="stFileUploaderDropzone"] {
-  background: #FFF8F5 !important;
+  background: var(--surface-soft) !important;
   border-radius: 12px !important;
 }
 
-/* Drop zone itself */
 [data-testid="stFileUploaderDropzone"] {
-  border: 2px dashed #F4C5BD !important;
-  color: var(--text) !important;
+  border: 2px dashed var(--border) !important;
+  color: var(--ink) !important;
+  padding: 32px !important;
+  transition: all 0.2s ease !important;
 }
 [data-testid="stFileUploaderDropzone"]:hover {
-  background: #FFF0ED !important;
-  border-color: var(--red) !important;
+  background: #ffffff !important;
+  border-color: var(--primary) !important;
 }
 
 /* Instructions text inside uploader */
@@ -307,66 +372,89 @@ button[data-testid="baseButton-secondary"] {
   color: var(--muted) !important;
 }
 
-/* Browse files button inside uploader */
+/* Browse files button */
 [data-testid="stFileUploaderDropzone"] button,
 [data-testid="stFileUploaderDropzoneInstructions"] button {
-  background: #FFF0ED !important;
-  color: var(--red) !important;
-  border: 1.5px solid #F4C5BD !important;
-  border-radius: 6px !important;
-  font-weight: 600 !important;
+  background: var(--canvas) !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  padding: 10px 16px !important;
+}
+[data-testid="stFileUploaderDropzone"] button:hover {
+  background: rgba(255, 56, 92, 0.05) !important;
 }
 
 /* Checkbox */
 [data-testid="stCheckbox"] label > div {
-  background: #FFFBF8 !important;
-  border-color: #F0E8E4 !important;
+  background: var(--canvas) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+[data-testid="stCheckbox"] label > div[data-checked="true"] {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
-/* Number/text area inputs */
+/* Text areas */
 textarea {
-  background: #FFFBF8 !important;
-  color: var(--text) !important;
-  border: 1.5px solid #F0E8E4 !important;
+  background: var(--canvas) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
+  font-family: inherit !important;
+}
+textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1) !important;
 }
 
-/* ── Toggle ── */
+/* ── Toggle switch ── */
 [data-testid="stToggle"] > label > div[data-checked="true"] {
-  background: var(--red) !important;
+  background: var(--primary) !important;
 }
 
 /* ── Dataframe ── */
 [data-testid="stDataFrame"] {
   border-radius: 12px !important;
   overflow: hidden !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--border-soft) !important;
+  background: var(--canvas) !important;
 }
 
-/* ── Progress bar ── */
-[data-testid="stProgressBar"] > div > div {
-  background: var(--red) !important;
+/* ── Progress bar (live updates) ── */
+[data-baseweb="progress-bar"] > div > div {
+  background: rgba(0,0,0,0.08) !important;
+  border-radius: 6px !important;
+  height: 10px !important;
+}
+[data-baseweb="progress-bar"] > div > div > div {
+  background: linear-gradient(90deg, var(--primary), #ff6b6b) !important;
+  border-radius: 6px !important;
+  transition: width 0.4s ease !important;
 }
 
-/* ── Sidebar (if any) ── */
+/* ── Sidebar ── */
 [data-testid="stSidebar"] {
-  background: #fff !important;
-  border-right: 1px solid var(--border) !important;
+  background: var(--canvas) !important;
+  border-right: 1px solid var(--border-soft) !important;
 }
 
-/* ── Expander ── */
+/* ── Expander (accordion) ── */
 [data-testid="stExpander"] {
-  background: #FFFBF8 !important;
-  border: 1px solid #F0E8E4 !important;
+  background: var(--canvas) !important;
+  border: 1px solid var(--border-soft) !important;
   border-radius: 10px !important;
 }
 [data-testid="stExpander"] summary,
 [data-testid="stExpander"] summary * {
-  color: #111827 !important;
-  background: #FFFBF8 !important;
+  color: var(--ink) !important;
+  background: transparent !important;
 }
 [data-testid="stExpander"] > div {
-  background: #FFFBF8 !important;
+  background: var(--surface-soft) !important;
 }
 
 /* ── Code blocks ── */
@@ -374,35 +462,37 @@ textarea {
 [data-testid="stCode"] > div,
 [data-testid="stCode"] pre,
 .stCode, pre {
-  background: #FFF5F3 !important;
-  border: 1px solid #F0E8E4 !important;
+  background: #f5f5f5 !important;
+  border: 1px solid var(--border-soft) !important;
   border-radius: 8px !important;
-  color: #111827 !important;
+  color: var(--ink) !important;
 }
 [data-testid="stCode"] code,
 [data-testid="stCode"] span,
 pre code, pre span {
-  color: #C4200F !important;
+  color: var(--primary) !important;
   background: transparent !important;
 }
 
-/* ── Custom hero banner ── */
+/* ── Hero banner (clean gradient, Rausch primary) ── */
 .carousell-hero {
-  background: linear-gradient(135deg, var(--red) 0%, #C4200F 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-active) 100%);
   border-radius: 16px;
-  padding: 32px 36px;
-  margin-bottom: 24px;
+  padding: 48px 40px;
+  margin-bottom: 32px;
   color: white;
 }
 .carousell-hero h1 {
-  color: white !important;
-  font-size: 2.3rem !important;
-  font-weight: 800 !important;
-  margin: 0 0 8px 0 !important;
+  color: #ffffff !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1.43 !important;
+  margin: 0 0 12px 0 !important;
 }
 .carousell-hero p {
-  color: rgba(255,255,255,0.85) !important;
-  font-size: 1.1rem !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
   margin: 0 !important;
 }
 .carousell-hero-inner {
@@ -442,36 +532,30 @@ pre code, pre span {
   resize: none !important;
 }
 
-/* ── Data editor: fix white text on selected cells ── */
+/* ── Data editor: cell selection ── */
 [data-testid="stDataEditor"] .dvn-scroller .rdg-cell[aria-selected="true"],
 [data-testid="stDataEditor"] .rdg-cell:focus,
 [data-testid="stDataEditor"] .rdg-row:hover .rdg-cell {
-  color: #111827 !important;
+  color: var(--ink) !important;
 }
 [data-testid="stDataEditor"] .rdg-cell[aria-selected="true"] {
-  background: rgba(211, 28, 12, 0.08) !important;
-  color: #111827 !important;
-  outline: 2px solid #D91C0C !important;
+  background: rgba(255, 56, 92, 0.08) !important;
+  color: var(--ink) !important;
+  outline: 2px solid var(--primary) !important;
 }
 [data-testid="stDataEditor"] input,
 [data-testid="stDataEditor"] textarea {
-  color: #111827 !important;
-  background: white !important;
+  color: var(--ink) !important;
+  background: var(--canvas) !important;
+  border-color: var(--border) !important;
+}
+[data-testid="stDataEditor"] input:focus,
+[data-testid="stDataEditor"] textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
 }
 
-/* ── Progress bars ── */
-[data-baseweb="progress-bar"] > div > div {
-  background: rgba(0,0,0,0.08) !important;
-  border-radius: 6px !important;
-  height: 10px !important;
-}
-[data-baseweb="progress-bar"] > div > div > div {
-  background: linear-gradient(90deg, #D91C0C, #ff6b6b) !important;
-  border-radius: 6px !important;
-  transition: width 0.4s ease !important;
-}
-
-/* ── File upload success indicator ── */
+/* File upload success indicator (✓ tick) */
 [data-testid="stFileUploaderFileName"]::after {
   content: " ✓";
   color: #22c55e;
@@ -479,7 +563,7 @@ pre code, pre span {
   font-size: 1em;
 }
 
-/* ── Greyed tabs when not ready ── */
+/* ── Greyed tabs when loading ── */
 .tabs-disabled [data-testid="stTabs"] {
   opacity: 0.4;
   pointer-events: none;
