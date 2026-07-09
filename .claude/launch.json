@@ -3,9 +3,12 @@
   "configurations": [
     {
       "name": "studio",
-      "runtimeExecutable": ".venv/bin/streamlit",
-      "runtimeArgs": ["run", "app.py", "--server.port", "8502", "--server.headless", "true"],
-      "port": 8502
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        ".venv/bin/streamlit run app.py --server.port $PORT --server.headless true --server.address 0.0.0.0"
+      ],
+      "autoPort": true
     }
   ]
 }

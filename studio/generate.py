@@ -111,6 +111,8 @@ def generate(
     session: StudioSession,
     do_describe: bool = True,
     model: str = "claude-haiku-4-5",
+    cover_path: Optional[Path] = None,
+    back_cover_path: Optional[Path] = None,
     progress_cb: Optional[Callable[[int, int, str, str], None]] = None,
 ) -> dict:
     """Build and render the corrected catalogue. Returns a result summary."""
@@ -184,6 +186,8 @@ def generate(
         sections=[section],
         output_path=Path(out),
         cache_dir=cache_dir,
+        cover_path=Path(cover_path) if cover_path else None,
+        back_cover_path=Path(back_cover_path) if back_cover_path else None,
     )
     render_pdf(job)
     session.output_path = out

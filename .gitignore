@@ -6,3 +6,4 @@ __pycache__/
 *.env
 /tmp/
 .DS_Store
+studio/static/fonts/

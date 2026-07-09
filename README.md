@@ -2,10 +2,26 @@
 
 One app, three features, for maintaining Carousell VVIP merchant e-catalogues.
 
+## Setup
+
+Requires Python 3.10+.
+
+```bash
+git clone https://github.com/<your-username>/vvip-catalogue-studio.git
+cd vvip-catalogue-studio
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+playwright install chromium        # one-time, for QR live-verify + profile fetch
+streamlit run app.py
 ```
-cd ~/vvip-catalogue-studio
-./run.sh                      # or: .venv/bin/streamlit run app.py
-```
+
+This opens the app in your browser at `http://localhost:8501`, running
+entirely on your own machine — uploaded PDFs and sheets never leave your
+computer.
+
+Optional: set `ANTHROPIC_API_KEY` in your shell for AI-generated merchant
+descriptions (falls back to a generic description without it).
 
 Load a **catalogue PDF** + the **VVIP master sheet**, then work through three tabs.
 
@@ -50,9 +66,9 @@ studio/
   runner.py            run a Playwright stage on a background thread
 ```
 
-Engines reused as-is:
-- **qrcheck** (`~/qr-catalogue-checker`) — PDF extraction, master ingest, live verify
-- **catbuilder** (`~/catalogue-builder`) — profile fetch, describe, QR gen, PDF render
+Engines reused as-is (vendored at the repo root, not external packages):
+- **qrcheck/** — PDF extraction, master ingest, live verify
+- **catbuilder/** — profile fetch, describe, QR gen, PDF render
 
 The Playwright-backed stages (live QR check, profile fetch) run on a **background
 thread** inside the Streamlit process — sync Playwright can't `start()` on a thread

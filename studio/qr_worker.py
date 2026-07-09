@@ -62,13 +62,13 @@ def _verify_http(url: str) -> dict:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": "invalid URL scheme"}
 
     try:
-        resp = httpx.get(
-            url,
+        with httpx.Client(
             follow_redirects=True,
             max_redirects=5,
             timeout=20,
             headers={"User-Agent": _UA},
-        )
+        ) as _client:
+            resp = _client.get(url)
     except Exception as e:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 

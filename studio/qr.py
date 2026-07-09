@@ -105,8 +105,11 @@ def _handle_from_url(url: str) -> str:
 def _http_verify(url: str) -> dict:
     try:
         import httpx
-        resp = httpx.get(url, follow_redirects=True, max_redirects=5, timeout=20,
-                         headers={"User-Agent": _UA})
+        # max_redirects is a Client argument, not a request argument — passing it to
+        # the module-level httpx.get() raises "get() got an unexpected keyword argument".
+        with httpx.Client(follow_redirects=True, max_redirects=5, timeout=20,
+                          headers={"User-Agent": _UA}) as client:
+            resp = client.get(url)
     except Exception as e:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 

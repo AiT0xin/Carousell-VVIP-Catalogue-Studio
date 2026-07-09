@@ -75,7 +75,11 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
 
     url = f"https://www.carousell.sg/u/{handle}/"
     try:
-        resp = httpx.get(url, follow_redirects=True, max_redirects=5, timeout=20, headers={"User-Agent": _UA})
+        # max_redirects belongs on the Client, not the module-level httpx.get()
+        # (passing it there raises "get() got an unexpected keyword argument").
+        with httpx.Client(follow_redirects=True, max_redirects=5, timeout=20,
+                          headers={"User-Agent": _UA}) as client:
+            resp = client.get(url)
     except Exception:
         return None
 
@@ -119,8 +123,9 @@ def download_avatar_http(avatar_url: str, handle: str, cache_dir: Path) -> Optio
     if out.exists():
         return out
     try:
-        resp = httpx.get(avatar_url, timeout=15, follow_redirects=True,
-                         max_redirects=5, headers={"User-Agent": _UA})
+        with httpx.Client(follow_redirects=True, max_redirects=5, timeout=15,
+                          headers={"User-Agent": _UA}) as client:
+            resp = client.get(avatar_url)
         resp.raise_for_status()
         from PIL import Image
         Image.open(io.BytesIO(resp.content)).convert("RGBA").save(out, "PNG")

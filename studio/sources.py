@@ -4,8 +4,8 @@ This is the ONLY place that knows where the engine code lives. Everything else
 imports the re-exported names from here, so if the engines move we change one
 file.
 
-  - qrcheck     (~/qr-catalogue-checker)  — extraction, master ingest, live verify
-  - catbuilder  (~/catalogue-builder)     — profile fetch, describe, QR gen, render
+  - qrcheck     (vendored at repo root)  — extraction, master ingest, live verify
+  - catbuilder  (vendored at repo root)  — profile fetch, describe, QR gen, render
 
 Heavy / native-backed entry points (QR decode → cv2+pyzbar, live verify + profile
 fetch → Playwright) are **lazy**: the underlying module is imported the first time
@@ -22,12 +22,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-QRCHECK_ROOT = Path.home() / "qr-catalogue-checker"
-CATBUILD_ROOT = Path.home() / "catalogue-builder"
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
-for root in (QRCHECK_ROOT, CATBUILD_ROOT):
-    if root.exists() and str(root) not in sys.path:
-        sys.path.insert(0, str(root))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 # Lightweight + shim only. (The shim just sets ctypes search paths; it does not
 # import pyzbar or OpenCV, so this stays cheap.)
