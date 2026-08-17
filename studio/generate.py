@@ -110,7 +110,7 @@ def _fallback_description(m: MerchantData) -> str:
 def generate(
     session: StudioSession,
     do_describe: bool = True,
-    model: str = "claude-haiku-4-5",
+    model: Optional[str] = None,   # None → describer picks from AI_MODEL / default
     cover_path: Optional[Path] = None,
     back_cover_path: Optional[Path] = None,
     progress_cb: Optional[Callable[[int, int, str, str], None]] = None,
@@ -125,7 +125,8 @@ def generate(
     merchants: list[MerchantData] = []
     skipped: list[str] = []
 
-    have_key = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    from catbuilder.describer import ai_configured
+    have_key = ai_configured()
 
     for i, h in enumerate(handles):
         m = MerchantData(handle=h, category=category, profile_url=profile_url_for(h))

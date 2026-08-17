@@ -47,7 +47,7 @@ from catbuilder.models import (  # noqa: E402
     CatalogueJob,
     colour_for_category,
 )
-from catbuilder.describer import generate_description  # noqa: E402  (imports anthropic, no native)
+from catbuilder.describer import generate_description, ai_configured  # noqa: E402  (OpenAI-compatible, no native)
 from catbuilder.qrgen import generate_qr  # noqa: E402            (imports qrcode, no native)
 from catbuilder.pdf_render import render_pdf  # noqa: E402         (imports reportlab, no native)
 
@@ -108,6 +108,7 @@ __all__ = [
     "colour_for_category",
     "fetch_and_cache",
     "generate_description",
+    "ai_configured",
     "generate_qr",
     "render_pdf",
 ]

@@ -20,8 +20,25 @@ This opens the app in your browser at `http://localhost:8501`, running
 entirely on your own machine — uploaded PDFs and sheets never leave your
 computer.
 
-Optional: set `ANTHROPIC_API_KEY` in your shell for AI-generated merchant
-descriptions (falls back to a generic description without it).
+Optional — AI-written merchant descriptions. Without any config, cards use a
+generic description. To enable AI descriptions, point the app at any
+OpenAI-compatible provider via env vars (pick a free one):
+
+```bash
+# Ollama Cloud (free tier) — key from ollama.com
+export AI_BASE_URL=https://ollama.com/v1
+export AI_API_KEY=<your-ollama-key>
+export AI_MODEL=gpt-oss:120b
+
+# …or local Ollama (free, offline — run `ollama serve` and `ollama pull llama3.2`)
+export AI_BASE_URL=http://localhost:11434/v1
+export AI_MODEL=llama3.2            # no key needed
+
+# …or Google Gemini (free tier) — key from aistudio.google.com/app/apikey
+export AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+export AI_API_KEY=<your-gemini-key>
+export AI_MODEL=gemini-1.5-flash
+```
 
 Load a **catalogue PDF** + the **VVIP master sheet**, then work through three tabs.
 
@@ -77,8 +94,9 @@ subprocess required.
 
 ## Notes / environment
 
-- **AI descriptions** need `ANTHROPIC_API_KEY` in your shell; without it, cards get a
-  generic description (toggle is disabled).
+- **AI descriptions** need an OpenAI-compatible provider configured via
+  `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` (see the free options above); without
+  it, cards get a generic description (toggle is disabled).
 - **macOS sandbox**: if launched in a restricted sandbox, files under `~/Downloads`
   and `~/Library/CloudStorage` may be unreadable. The app prefers
   `/tmp/qrcheck_master.xlsx` and `/tmp/qrcheck_archive/*.pdf`; stage copies there if
