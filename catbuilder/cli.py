@@ -37,7 +37,7 @@ def _load_from_master(master_path: Path, category: str | None) -> list[Catalogue
     try:
         from qrcheck.ingest import load_master
     except ImportError:
-        print("⚠  Could not import qrcheck parser. Falling back to simple parser.")
+        print("Warning: Could not import qrcheck parser. Falling back to simple parser.")
         return _load_from_master_simple(master_path, category)
 
     # qrcheck's load_master reads one sheet at a time by category keyword
@@ -200,7 +200,7 @@ def run(argv: list[str] | None = None) -> None:
         import os
         if not os.environ.get("ANTHROPIC_API_KEY"):
             print(
-                "\n⚠  ANTHROPIC_API_KEY is not set.\n"
+                "\nWarning: ANTHROPIC_API_KEY is not set.\n"
                 "   Add it to your shell profile, then re-run:\n"
                 "     echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.zshrc\n"
                 "     source ~/.zshrc\n"

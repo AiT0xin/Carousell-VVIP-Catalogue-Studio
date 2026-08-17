@@ -116,7 +116,7 @@ def run(pdf_path: str, out_path: str, master_path: str | None = None,
     summary = write_report(report_rows, out_path)
     log(f"      {summary['total']} rows, {summary['flagged']} flagged for review")
     for code, n in sorted(summary["counts"].items(), key=lambda kv: kv[0].value):
-        marker = "  ⚑" if code.is_flag else "   "
+        marker = "  [!]" if code.is_flag else "   "
         log(f"      {marker} {code.value:20} {n}")
     return summary
 

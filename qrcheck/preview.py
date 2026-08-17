@@ -109,7 +109,7 @@ def render_page_preview(
 
             # Mismatch indicator
             if r.printed_handle and r.decoded_handle and r.printed_handle != r.decoded_handle:
-                warn = f"⚠ printed @{r.printed_handle} ≠ QR @{r.decoded_handle}"
+                warn = f"printed @{r.printed_handle} != QR @{r.decoded_handle}"
                 bbox_w = draw.textbbox((0, 0), warn, font=font)
                 ww = bbox_w[2] - bbox_w[0]
                 wh = bbox_w[3] - bbox_w[1]

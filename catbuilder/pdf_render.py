@@ -417,54 +417,53 @@ def _draw_card(
                 c.drawImage(ImageReader(buf), tx, strip_bot_y,
                             width=tile_w, height=_STRIP_H)
                 c.restoreState()
-    else:
-        # No product images — draw a subtle placeholder tint block
-        c.setFillColor(colors.Color(r / 255 * 0.05 + 0.92,
-                                    g / 255 * 0.05 + 0.92,
-                                    b / 255 * 0.05 + 0.92))
-        c.roundRect(card_x + 6, strip_bot_y, _CONTENT_W - 12, _STRIP_H, 4, fill=1, stroke=0)
-        c.setFont(REG, 7)
-        c.setFillColor(colors.HexColor("#AAAAAA"))
-        c.drawString(card_x + _CONTENT_W / 2 - 30, strip_bot_y + _STRIP_H / 2 - 4, "no preview images")
 
-    # ── Description text (2-3 compact lines) ──────────────────────────────
-    c.setFont(REG, 7.5)
-    c.setFillColor(_GREY)
-    _draw_wrapped_text(
-        c, merchant.description,
-        card_x + 10, card_top_y - _DESC_Y_REL,
-        _CONTENT_W - 14, 7.5,
-        max_lines=3, line_height=11.0,
-    )
+        # ── Description text below the image strip (compact) ──────────────
+        c.setFont(REG, 7.5)
+        c.setFillColor(_GREY)
+        _draw_wrapped_text(
+            c, merchant.description,
+            card_x + 10, card_top_y - _DESC_Y_REL,
+            _CONTENT_W - 14, 7.5,
+            max_lines=3, line_height=11.0,
+        )
+    else:
+        # No product images — use that whole region for the description text
+        # (starts just under the identity divider and flows down the card).
+        c.setFont(REG, 8.5)
+        c.setFillColor(_GREY)
+        _draw_wrapped_text(
+            c, merchant.description,
+            card_x + 10, card_top_y - (_DIVIDER_Y_REL + 8),
+            _CONTENT_W - 14, 8.5,
+            max_lines=7, line_height=12.5,
+        )
 
     # ── QR zone (white pill on right side) ────────────────────────────────
     qr_zone_x = card_x + _CONTENT_W
     qr_bg_pad = 8
     qr_bg_x   = qr_zone_x + (_QR_ZONE_W - _QR_BOX_W) / 2 - qr_bg_pad / 2
-    qr_bg_y   = y_bottom + (CARD_H - 4 - _QR_BOX_H - 22) / 2
+
+    pill_w = _QR_BOX_W + qr_bg_pad
+    pill_h = _QR_BOX_H + 6                       # snug now the label is gone
+    pill_y = y_bottom + (CARD_H - 4 - pill_h) / 2  # vertically centred in card
 
     # White pill background behind QR
     c.setFillColor(_WHITE)
     c.setStrokeColor(_QR_BDR)
     c.setLineWidth(0.5)
-    c.roundRect(qr_bg_x, qr_bg_y - 2, _QR_BOX_W + qr_bg_pad, _QR_BOX_H + 20, 6, fill=1, stroke=1)
+    c.roundRect(qr_bg_x, pill_y, pill_w, pill_h, 6, fill=1, stroke=1)
 
-    # QR image
+    # QR image, centred within the pill
     if merchant.qr_path and merchant.qr_path.exists():
         qr_inner = _QR_BOX_W - 2 * _QR_PAD
         c.drawImage(
             str(merchant.qr_path),
-            qr_bg_x + _QR_PAD + qr_bg_pad / 2,
-            qr_bg_y + 16,
+            qr_bg_x + (pill_w - qr_inner) / 2,
+            pill_y + (pill_h - qr_inner) / 2,
             width=qr_inner, height=qr_inner,
         )
 
-    # "Scan" label
-    c.setFont(BOLD, 6.5)
-    c.setFillColor(colors.HexColor("#999999"))
-    lbl = "SCAN TO VISIT"
-    lbl_w = stringWidth(lbl, BOLD, 6.5)
-    c.drawString(qr_bg_x + (_QR_BOX_W + qr_bg_pad) / 2 - lbl_w / 2, qr_bg_y + 4, lbl)
 
 
 # ── Page layout planner ────────────────────────────────────────────────────────
@@ -644,4 +643,4 @@ def render_pdf(job: CatalogueJob) -> None:
         c.showPage()
 
     c.save()
-    print(f"✅ Saved: {job.output_path}")
+    print(f"Saved: {job.output_path}")

@@ -287,7 +287,7 @@ def fetch_and_cache(
     """Fetch profile + download avatar for a MerchantData, mutating it in place."""
     data = fetch_profile(merchant.handle, cache_dir, throttle)
     if data is None:
-        print(f"  ⚠ @{merchant.handle} — profile not found, skipping")
+        print(f"  @{merchant.handle} — profile not found, skipping")
         return merchant
 
     merchant.display_name = data.get("display_name") or merchant.handle.title()
