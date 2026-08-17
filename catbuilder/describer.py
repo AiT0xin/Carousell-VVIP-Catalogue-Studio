@@ -205,9 +205,12 @@ def generate_description(
 
     client = _get_client()
     prompt = _build_prompt(merchant, listing_titles, web_context)
+    # Generous ceiling: reasoning models (e.g. nemotron) spend most of their
+    # budget "thinking" and only then emit the answer, so a low cap returns an
+    # empty string. Non-reasoning models just stop early — no extra cost.
     resp = client.chat.completions.create(
         model=model,
-        max_tokens=200,
+        max_tokens=2000,
         messages=[
             {"role": "system", "content": _SYSTEM},
             {"role": "user", "content": prompt},
