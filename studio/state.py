@@ -103,6 +103,10 @@ class StudioSession:
     # progress flags so the UI can gate features
     crosscheck_done: bool = False
     qrcheck_done: bool = False
+    generate_done: bool = False
+    # persisted result of the last generation so the success panel + download
+    # survive the rerun that refreshes the sidebar status
+    generate_result: Optional[dict] = None
 
     # Shared with catbuilder so fetched profiles/avatars/QRs are reused.
     # Use ~/.cache (user-private) instead of world-readable /tmp

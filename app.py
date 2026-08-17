@@ -29,7 +29,7 @@ from studio.state import (
 
 PROJECT_ROOT = Path(__file__).parent
 
-st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide", page_icon="🗂️")
+st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide")
 
 # ── Design system: load catalogue imagery + fonts ─────────────────────────────
 import base64 as _b64
@@ -301,9 +301,15 @@ h4, h5, h6 {
   font-weight: 700 !important;
 }
 
-/* ── Primary buttons (Rausch) ── */
+/* ── Primary + Download buttons (solid Rausch) ──
+   Keyed off the stable kind="primary" attribute (and the download wrapper) so
+   styling can't fall through to a white default if Streamlit renames its
+   data-testids between versions. */
+button[kind="primary"],
 [data-testid="stButton"] button[kind="primary"],
-button[data-testid="baseButton-primary"] {
+[data-testid="stBaseButton-primary"],
+[data-testid="stDownloadButton"] button[kind],
+[data-testid="stDownloadButton"] button {
   background: var(--primary) !important;
   background-color: var(--primary) !important;
   color: #ffffff !important;
@@ -318,35 +324,46 @@ button[data-testid="baseButton-primary"] {
   position: relative !important;
   overflow: hidden !important;
 }
-[data-testid="stButton"] button[kind="primary"] *,
-[data-testid="stButton"] button[kind="primary"] p,
-[data-testid="stButton"] button[kind="primary"] span {
+button[kind="primary"] *,
+button[kind="primary"] p,
+button[kind="primary"] span,
+[data-testid="stDownloadButton"] button[kind] *,
+[data-testid="stDownloadButton"] button[kind] p,
+[data-testid="stDownloadButton"] button[kind] span,
+[data-testid="stDownloadButton"] button *,
+[data-testid="stDownloadButton"] button p,
+[data-testid="stDownloadButton"] button span {
   background: transparent !important;
   background-color: transparent !important;
   color: #ffffff !important;
 }
-[data-testid="stButton"] button[kind="primary"]:hover {
+button[kind="primary"]:hover,
+[data-testid="stDownloadButton"] button[kind]:hover,
+[data-testid="stDownloadButton"] button:hover {
   background: var(--primary-active) !important;
   box-shadow: 0 8px 16px rgba(139, 10, 26, 0.3) !important;
   transform: translateY(-2px) !important;
 }
-[data-testid="stButton"] button[kind="primary"]:active {
+button[kind="primary"]:active,
+[data-testid="stDownloadButton"] button[kind]:active,
+[data-testid="stDownloadButton"] button:active {
   transform: translateY(0px) !important;
   box-shadow: 0 2px 4px rgba(139, 10, 26, 0.2) !important;
 }
-[data-testid="stButton"] button[kind="primary"]:disabled {
+button[kind="primary"]:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
 }
-[data-testid="stButton"] button[kind="primary"]:focus-visible {
+button[kind="primary"]:focus-visible {
   outline: 2px solid var(--primary) !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 0 4px rgba(139, 10, 26, 0.15) !important;
 }
 
 /* ── Secondary buttons (outline) ── */
+button[kind="secondary"],
 [data-testid="stButton"] button[kind="secondary"],
-button[data-testid="baseButton-secondary"] {
+[data-testid="stBaseButton-secondary"] {
   border: 1.5px solid var(--primary) !important;
   color: var(--primary) !important;
   background: var(--canvas) !important;
@@ -359,43 +376,24 @@ button[data-testid="baseButton-secondary"] {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   cursor: pointer !important;
 }
-[data-testid="stButton"] button[kind="secondary"] *,
-[data-testid="stButton"] button[kind="secondary"] p,
-[data-testid="stButton"] button[kind="secondary"] span {
+button[kind="secondary"] *,
+button[kind="secondary"] p,
+button[kind="secondary"] span {
   background: transparent !important;
   background-color: transparent !important;
   color: var(--primary) !important;
 }
-[data-testid="stButton"] button[kind="secondary"]:hover {
+button[kind="secondary"]:hover {
   background: rgba(139, 10, 26, 0.05) !important;
   border-color: var(--primary-active) !important;
   color: var(--primary-active) !important;
 }
-[data-testid="stButton"] button[kind="secondary"]:active {
+button[kind="secondary"]:active {
   background: rgba(139, 10, 26, 0.1) !important;
 }
-[data-testid="stButton"] button[kind="secondary"]:disabled {
+button[kind="secondary"]:disabled {
   opacity: 0.5 !important;
   cursor: not-allowed !important;
-}
-
-/* ── Download button ── */
-[data-testid="stDownloadButton"] button {
-  background: var(--primary) !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  cursor: pointer !important;
-}
-[data-testid="stDownloadButton"] button:hover {
-  background: var(--primary-active) !important;
-  box-shadow: 0 8px 16px rgba(139, 10, 26, 0.3) !important;
-  transform: translateY(-2px) !important;
-}
-[data-testid="stDownloadButton"] button:active {
-  transform: translateY(0px) !important;
 }
 
 /* ── Metric cards (simple, clean) ── */
@@ -416,10 +414,13 @@ button[data-testid="baseButton-secondary"] {
   line-height: 1.4 !important;
 }
 [data-testid="stMetricValue"] {
-  font-size: 32px !important;
+  font-size: 46px !important;
   font-weight: 800 !important;
-  line-height: 1.2 !important;
-  color: var(--ink) !important;
+  line-height: 1.15 !important;
+  color: #1d4ed8 !important;
+}
+[data-testid="stMetricValue"] * {
+  color: #1d4ed8 !important;
 }
 [data-testid="stMetricDelta"] {
   font-size: 14px !important;
@@ -1054,13 +1055,6 @@ pre code, pre span {
   outline: none !important;
 }
 
-/* File upload success indicator (✓ tick) */
-[data-testid="stFileUploaderFileName"]::after {
-  content: " ✓";
-  color: #22c55e;
-  font-weight: 700;
-  font-size: 1em;
-}
 
 /* ── Hero empty state text ── */
 .hero-heading {
@@ -1247,37 +1241,75 @@ sess: StudioSession = st.session_state.sess
 def _show_tos():
     st.markdown("""
 **VVIP E-Catalogue Studio — Terms of Use**
-*Last updated: 27 June 2026*
+*Last updated: 17 August 2026*
+
+By accessing, installing, running, or otherwise using this Software, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use ("Terms") in their entirety. If you do not agree, do not use the Software.
 
 ---
 
 **1. Nature of This Software**
 
-VVIP E-Catalogue Studio ("the Software") is an independent productivity tool developed by Owin Tan ("the Developer") to streamline the VVIP Flyer and E-Catalogue workflow. It is a personal software project and is not affiliated with, endorsed by, sponsored by, or in any way officially connected to Carousell Pte. Ltd., Carousell Group, or any of its subsidiaries or affiliates ("Carousell Group").
+VVIP E-Catalogue Studio ("the Software") is an independent, personal productivity tool developed by Owin Tan ("the Developer") to assist with the VVIP Flyer and E-Catalogue workflow. It is provided as a personal, non-commercial software project and is not affiliated with, endorsed by, sponsored by, authorised by, or in any way officially connected to Carousell Pte. Ltd., Carousell Group, or any of their subsidiaries, affiliates, officers, employees, contractors, or agents ("Carousell Group"), nor to any other company, platform, or third party referenced within it.
 
-**2. No Infringement Intended**
+**2. No Affiliation; No Infringement Intended**
 
-This Software does not claim ownership over, reproduce, or distribute any proprietary content, branding, data, or intellectual property belonging to Carousell Group. Any references to Carousell's platform, merchant profiles, or catalogue formats are purely incidental to the Software's workflow automation purpose. The Developer respects all applicable intellectual property rights.
+The Software does not claim ownership over, reproduce, redistribute, or commercialise any proprietary content, trademarks, branding, data, or intellectual property belonging to Carousell Group or any third party. All product names, logos, brands, and trademarks are the property of their respective owners and are referenced for identification and interoperability purposes only. Any interaction with third-party platforms, merchant profiles, or catalogue formats is incidental to the Software's workflow-automation purpose. The Developer respects all applicable intellectual-property rights and intends no infringement.
 
-**3. Restriction on Copying by Carousell Group**
+**3. User Responsibility for Data and Inputs**
 
-Carousell Pte. Ltd., Carousell Group, and any of its subsidiaries, affiliates, employees, contractors, or agents are expressly prohibited from copying, reproducing, adapting, reverse-engineering, redistributing, sublicensing, or incorporating any part of this Software's source code, logic, or design — in whole or in part — into any commercial or internal product without the prior written consent of Owin Tan.
+You are solely responsible for any files, spreadsheets, images, PDFs, URLs, credentials, or other data ("Inputs") that you upload to or process with the Software. You represent and warrant that you own or have all necessary rights, licences, consents, and permissions to use, upload, and process such Inputs, and that doing so does not violate any law, contract, privacy right, intellectual-property right, or third-party terms of service. The Software processes Inputs locally on the machine on which it runs; the Developer does not collect, receive, store, monitor, or have access to your Inputs or outputs.
 
-**4. Permitted Use**
+**4. Third-Party Services and Platforms**
 
-This Software is made available for use by authorised individuals within the intended workflow context. Users may not redistribute, resell, or sublicense the Software without explicit written permission from the Developer.
+The Software may, at your direction, interact with third-party services and platforms (including but not limited to Carousell websites and the Anthropic API). Your use of any such third-party service is governed solely by that service's own terms of service, acceptable-use policies, and applicable laws. You are solely responsible for ensuring that your use of the Software — including any automated access, retrieval, verification, or processing of publicly available information — complies with those terms and with all applicable laws and regulations. The Developer does not endorse, control, or assume any responsibility for any third-party service, its availability, or the consequences of your use of it.
 
-**5. No Warranty**
+**5. Acceptable Use and Assumption of Risk**
 
-This Software is provided "as is", without warranty of any kind, express or implied. The Developer makes no guarantees regarding accuracy, completeness, or fitness for any particular purpose.
+You agree to use the Software only for lawful purposes and in accordance with these Terms. You assume all risk arising from your use of the Software. You are responsible for independently reviewing, verifying, and validating all outputs (including generated catalogues, QR codes, and merchant data) before relying on, publishing, distributing, or acting upon them. The Software's outputs may be incomplete, inaccurate, or out of date, and must not be treated as authoritative without independent verification.
 
-**6. Limitation of Liability**
+**6. Restriction on Copying**
 
-The Developer shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use this Software.
+The Software, including its source code, logic, structure, design, and presentation, is the intellectual property of Owin Tan. Carousell Group, and any other person or entity, is expressly prohibited from copying, reproducing, adapting, translating, reverse-engineering, decompiling, redistributing, sublicensing, or incorporating any part of the Software — in whole or in part — into any commercial, internal, or derivative product without the prior written consent of Owin Tan. No rights are granted except as expressly set out in these Terms.
 
-**7. Governing Law**
+**7. Permitted Use**
 
-These Terms shall be governed by and construed in accordance with the laws of the Republic of Singapore.
+The Software is made available for use by authorised individuals within the intended workflow context. You may not redistribute, resell, sublicense, rent, lease, or make the Software available to any third party without the Developer's explicit prior written permission.
+
+**8. No Warranty**
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, ACCURACY, OR NON-INFRINGEMENT. THE DEVELOPER DOES NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, OR THAT ANY OUTPUT WILL BE ACCURATE OR COMPLETE. YOU USE THE SOFTWARE ENTIRELY AT YOUR OWN RISK.
+
+**9. Limitation of Liability**
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE DEVELOPER BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, GOODWILL, OR BUSINESS OPPORTUNITY, ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THESE TERMS, WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, EVEN IF THE DEVELOPER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE DEVELOPER'S TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS RELATING TO THE SOFTWARE SHALL NOT EXCEED SGD 0 (ZERO SINGAPORE DOLLARS).
+
+**10. Indemnification**
+
+You agree to indemnify, defend, and hold harmless the Developer from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable legal fees) arising out of or related to (a) your use or misuse of the Software; (b) your Inputs; (c) your violation of these Terms; (d) your violation of any law or any third-party right, including any third-party terms of service, intellectual-property right, or privacy right.
+
+**11. No Support Obligation**
+
+The Software is provided without any obligation on the part of the Developer to provide maintenance, updates, support, or corrections of any kind.
+
+**12. Compliance with Laws**
+
+You are solely responsible for ensuring that your use of the Software complies with all laws, regulations, and third-party agreements applicable to you, including data-protection and privacy laws.
+
+**13. Severability**
+
+If any provision of these Terms is held to be invalid, illegal, or unenforceable, that provision shall be severed and the remaining provisions shall continue in full force and effect.
+
+**14. Changes to These Terms**
+
+The Developer may modify these Terms at any time. Continued use of the Software after any change constitutes acceptance of the revised Terms. The "Last updated" date above indicates when these Terms were most recently revised.
+
+**15. Entire Agreement**
+
+These Terms constitute the entire agreement between you and the Developer regarding the Software and supersede any prior understandings or agreements.
+
+**16. Governing Law and Jurisdiction**
+
+These Terms shall be governed by and construed in accordance with the laws of the Republic of Singapore, without regard to its conflict-of-laws principles. You agree to submit to the exclusive jurisdiction of the courts of Singapore in respect of any dispute arising out of or in connection with these Terms or the Software.
 
 ---
 
@@ -1290,6 +1322,8 @@ def _reset_results():
     sess.changes = []
     sess.crosscheck_done = False
     sess.qrcheck_done = False
+    sess.generate_done = False
+    sess.generate_result = None
     sess.output_path = None
 
 
@@ -1389,9 +1423,9 @@ section[data-testid="stSidebar"] [data-testid="stSelectbox"] span {
 """, unsafe_allow_html=True)
 
     st.markdown('<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:0 0 16px 0;">', unsafe_allow_html=True)
-    st.markdown('<p style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff !important;margin-bottom:12px;">STEP 1  UPLOAD FILES</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff !important;margin-bottom:12px;">STEP 1  CATALOGUE PDF</p>', unsafe_allow_html=True)
 
-    uploaded = st.file_uploader("Catalogue PDF", type=["pdf"])
+    uploaded = st.file_uploader("Catalogue PDF", type=["pdf"], label_visibility="collapsed")
     # Only (re)process when a genuinely new file is uploaded — file_id is stable
     # across reruns, so this won't re-create tempfiles or wipe results each run.
     if uploaded is not None:
@@ -1409,7 +1443,9 @@ section[data-testid="stSidebar"] [data-testid="stSelectbox"] span {
         st.session_state["_cat_file_id"] = None
         _reset_results()
 
-    master_up = st.file_uploader("VVIP Master Sheet", type=["xlsx", "csv"])
+    st.markdown('<p style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff !important;margin:20px 0 12px 0;">STEP 2  VVIP MASTER SHEET</p>', unsafe_allow_html=True)
+
+    master_up = st.file_uploader("VVIP Master Sheet", type=["xlsx", "csv"], label_visibility="collapsed")
     if master_up is not None:
         if st.session_state.get("_master_file_id") != master_up.file_id:
             import tempfile, os
@@ -1426,7 +1462,7 @@ section[data-testid="stSidebar"] [data-testid="stSelectbox"] span {
         st.session_state["_master_file_id"] = None
         _reset_results()
 
-    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff;margin:20px 0 12px 0;">Step 2  Select Category</div>', unsafe_allow_html=True)
+    st.markdown('<div style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff;margin:20px 0 12px 0;">STEP 3  SELECT CATEGORY</div>', unsafe_allow_html=True)
 
     _CATEGORIES = ["Autos", "Services", "Luxury", "Goods"]
     _CAT_OPTIONS = ["Select Category"] + _CATEGORIES
@@ -1472,6 +1508,7 @@ section[data-testid="stSidebar"] [data-testid="stSelectbox"] span {
         (bool(sess.category),       "Category"),
         (sess.crosscheck_done,      "Cross check"),
         (sess.qrcheck_done,         "QR check"),
+        (sess.generate_done,        "Generate Catalogue"),
     ]
     stepper_html = (
         '<style>'
@@ -1580,8 +1617,8 @@ st.markdown("""
 </style>
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <span>An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em></span>
-    <span>An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em> An Owin × Claude Experiment <em>✦</em></span>
+    <span>Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em></span>
+    <span>Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em> Owin × Claude Code <em>✦</em></span>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -1619,21 +1656,27 @@ if not ready:
   padding: 1px 8px 1px; border-radius: 0 0 12px 12px;
 }
 </style>
+    """, unsafe_allow_html=True)
+
+    # Category tiles use the locally-embedded images (studio/static/*.b64) so the
+    # page is fully self-contained — no external hotlinks that can break, go
+    # stale, or leak each visitor's IP to third-party image hosts.
+    st.markdown(f"""
 <div class="cat-grid">
   <div class="cat-card">
-    <img src="https://rhiannonbosse.com/wp-content/uploads/2020/03/RhisBeautyFaves3.jpg" alt="Goods">
+    <img src="{_img_goods}" alt="Goods">
     <div class="cat-label">Goods</div>
   </div>
   <div class="cat-card">
-    <img src="https://airtasker-seo-assets-prod.s3.amazonaws.com/en_AU/1631143338634_vacuuming-min.jpg" alt="Services">
+    <img src="{_img_services}" alt="Services">
     <div class="cat-label">Services</div>
   </div>
   <div class="cat-card">
-    <img src="https://editorial.pxcrush.net/carsales/general/editorial/byd_denza_b8_2026-23.jpg?width=1024&height=682" alt="Autos">
+    <img src="{_img_autos}" alt="Autos">
     <div class="cat-label">Autos</div>
   </div>
   <div class="cat-card">
-    <img src="https://www.watchinsanity.it/wp-content/uploads/2021/06/Daniel_Roth_Watch_Insanity_12.jpg" alt="Luxury">
+    <img src="{_img_luxury}" alt="Luxury">
     <div class="cat-label">Luxury</div>
   </div>
 </div>
@@ -1814,7 +1857,7 @@ with tab1:
             with st.expander("Trace", expanded=True):
                 import re as _re; st.text(_re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err or ""))
         else:
-            prog.progress(1.0, text="Cross check complete ✓")
+            prog.progress(1.0, text="Cross check complete")
             import time as _t; _t.sleep(0.5); prog.empty()
             st.rerun()
 
@@ -1913,7 +1956,7 @@ with tab2:
     elif not sess.crosscheck_done:
         pass
     else:
-        do_live = st.toggle("Check each link is live (visits the URL)",
+        do_live = st.toggle("Check each link is live",
                             value=True)
         if st.button("Run QR check", type="primary", key="run_qr"):
             prog = st.progress(0.0, text="Starting…")
@@ -1941,7 +1984,7 @@ with tab2:
                     import re as _re; st.text(_re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err or "(no traceback captured)"))
             else:
                 sess.qrcheck_done = True
-                prog.progress(1.0, text="QR check complete ✅")
+                prog.progress(1.0, text="QR check complete")
                 import time as _t2; _t2.sleep(0.5); prog.empty()
                 st.rerun()
 
@@ -2029,21 +2072,22 @@ with tab3:
         plan = generate_plan(sess)
         m = st.columns(4)
         m[0].metric("Final merchants", plan["final_count"])
-        m[1].metric("➕ Adding", plan["added"])
-        m[2].metric("➖ Removing", plan["removed"])
-        m[3].metric("🔧 QR fixes", plan["qr_fixes"])
+        m[1].metric("Adding", plan["added"])
+        m[2].metric("Removing", plan["removed"])
+        m[3].metric("QR fixes", plan["qr_fixes"])
 
         st.caption("Generation rebuilds every card fresh (profile, description, "
                    "and a brand-new QR from the canonical URL) - so every broken "
                    "QR is corrected by construction.")
 
-        have_key = bool(os.environ.get("ANTHROPIC_API_KEY"))
+        from studio.sources import ai_configured
+        have_key = ai_configured()
         do_describe = st.toggle(
-            "Write AI descriptions (needs ANTHROPIC_API_KEY)",
+            "Write AI descriptions (needs an AI provider)",
             value=have_key, disabled=not have_key,
-            help=None if have_key else "Set ANTHROPIC_API_KEY in your shell to enable.")
+            help=None if have_key else "Set AI_BASE_URL / AI_API_KEY / AI_MODEL for a free provider (Ollama Cloud, local Ollama, or Gemini). See README.")
         if not have_key:
-            st.caption("⚠ No API key found - cards will use a generic description.")
+            st.caption("No API key found - cards will use a generic description.")
 
         st.markdown("**Cover pages** — optional. Upload a front and/or back "
                     "cover (PDF or image) to wrap the catalogue. Leave empty for "
@@ -2096,9 +2140,11 @@ with tab3:
                     else _out.with_suffix(".pdf")
             # Validate: must live within /tmp or the home dir. Resolve the allowed
             # roots too — on macOS /tmp is a symlink to /private/tmp, so a resolved
-            # output path won't match the literal "/tmp".
+            # output path won't match the literal "/tmp". Use real path containment
+            # (== root or root in parents), not a string prefix — a prefix check
+            # would wrongly accept siblings like /tmp-evil or /Users/owinX.
             _allowed = (Path("/tmp").resolve(), Path.home().resolve())
-            if not any(str(_out).startswith(str(p)) for p in _allowed):
+            if not any(_out == p or p in _out.parents for p in _allowed):
                 st.error("Output path must be within /tmp or your home directory.")
                 st.stop()
             # Make sure the parent folder exists so the render can write the file.
@@ -2138,29 +2184,44 @@ with tab3:
                     safe_err = _re.sub(r'File "/.+?/([^/"]+\.py)"', r'File "\1"', err)
                     st.text(safe_err)
             elif result:
-                prog.progress(1.0, text="Done ✅")
-                st.success(f"Built {result['built']} cards → {result['output']}")
-                if result["skipped"]:
-                    st.warning("Skipped (profile not found): " +
-                               ", ".join("@" + h for h in result["skipped"]))
-                out = Path(result["output"])
-                if out.exists():
-                    with open(out, "rb") as f:
-                        st.download_button("📥 Download corrected PDF", f.read(),
-                                           file_name=out.name,
-                                           mime="application/pdf",
-                                           use_container_width=True)
-                    # preview first page
-                    try:
-                        import pypdfium2 as pdfium
-                        doc = pdfium.PdfDocument(str(out))
-                        pages = list(doc)
-                        st.caption(f"Preview ({len(pages)} page(s))")
-                        for i, pg in enumerate(pages[:4]):
-                            st.image(pg.render(scale=1.4).to_pil(),
-                                     use_container_width=True)
-                    except Exception:
-                        pass
+                prog.progress(1.0, text="Done")
+                # Persist the result and rerun so the sidebar Session Status can
+                # light up "Generate Catalogue"; the panel below re-renders the
+                # success + download from session state after the rerun.
+                sess.generate_result = {
+                    "built": result["built"],
+                    "output": result["output"],
+                    "skipped": list(result.get("skipped", [])),
+                }
+                sess.generate_done = True
+                st.rerun()
+
+        # Persistent result panel — survives the rerun above so the download
+        # button and preview stay visible after generation completes.
+        if sess.generate_done and sess.generate_result:
+            _gr = sess.generate_result
+            st.success(f"Built {_gr['built']} cards - {_gr['output']}")
+            if _gr.get("skipped"):
+                st.warning("Skipped (profile not found): " +
+                           ", ".join("@" + h for h in _gr["skipped"]))
+            out = Path(_gr["output"])
+            if out.exists():
+                with open(out, "rb") as f:
+                    st.download_button("Download corrected PDF", f.read(),
+                                       file_name=out.name,
+                                       mime="application/pdf",
+                                       use_container_width=True)
+                # preview first pages
+                try:
+                    import pypdfium2 as pdfium
+                    doc = pdfium.PdfDocument(str(out))
+                    pages = list(doc)
+                    st.caption(f"Preview ({len(pages)} page(s))")
+                    for i, pg in enumerate(pages[:4]):
+                        st.image(pg.render(scale=1.4).to_pil(),
+                                 use_container_width=True)
+                except Exception:
+                    pass
 
 st.markdown("""
 <style>
@@ -2173,7 +2234,7 @@ div.tos-footer span { font-size:8px; color:rgba(0,0,0,0.3); letter-spacing:0.05e
   height:auto !important; min-height:0 !important; box-shadow:none !important;
 }
 </style>
-<div class="tos-footer"><span>© 2026 Owin Tan · Vibe Coded with Claude Code · v4</span></div>
+<div class="tos-footer"><span>© 2026 Owin Tan · Vibe Coded with Claude Code · v5</span></div>
 """, unsafe_allow_html=True)
 
 _, mid, _ = st.columns([3, 1, 3])
