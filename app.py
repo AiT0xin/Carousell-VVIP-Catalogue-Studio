@@ -405,8 +405,8 @@ button[kind="secondary"]:disabled {
   box-shadow: none !important;
 }
 [data-testid="stMetricLabel"] {
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.28px !important;
   color: var(--muted) !important;
@@ -417,10 +417,10 @@ button[kind="secondary"]:disabled {
   font-size: 46px !important;
   font-weight: 800 !important;
   line-height: 1.15 !important;
-  color: #1d4ed8 !important;
+  color: var(--ink) !important;
 }
 [data-testid="stMetricValue"] * {
-  color: #1d4ed8 !important;
+  color: var(--ink) !important;
 }
 [data-testid="stMetricDelta"] {
   font-size: 14px !important;
