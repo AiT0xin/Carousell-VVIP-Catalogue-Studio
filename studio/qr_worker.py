@@ -18,9 +18,9 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse
 
-for root in [Path.home() / "qr-catalogue-checker", Path.home() / "catalogue-builder"]:
-    if root.exists() and str(root) not in sys.path:
-        sys.path.insert(0, str(root))
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 _UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -30,6 +30,36 @@ _NOT_FOUND = re.compile(r"404 page|can'?t find the page|page not found", re.I)
 _CANONICAL = re.compile(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']', re.I)
 _OG_URL    = re.compile(r'<meta[^>]+property=["\']og:url["\'][^>]+content=["\']([^"\']+)["\']', re.I)
 _GENERIC_TITLE = "carousell - snap to list, chat to buy"
+
+# SSRF allowlist — kept in sync with studio/qr.py. Duplicated (not imported) so
+# this subprocess stays import-isolated from the rest of the studio package.
+_ALLOWED_VERIFY_DOMAINS = (
+    "carousell.sg",
+    "carousell.com",
+    "carousell.com.my",
+    "carousell.ph",
+    "caro.sl",
+)
+
+
+def _is_verifiable_url(url: str) -> bool:
+    """True only for http(s) URLs on a known Carousell host — blocks SSRF.
+
+    Matches a base domain exactly or as a proper subdomain, so lookalikes
+    like ``evilcarousell.sg`` and ``carousell.sg.attacker.com`` are rejected.
+    """
+    try:
+        p = urlparse(url)
+    except Exception:
+        return False
+    if p.scheme not in ("http", "https"):
+        return False
+    host = (p.hostname or "").lower()
+    if not host:
+        return False
+    return any(
+        host == d or host.endswith("." + d) for d in _ALLOWED_VERIFY_DOMAINS
+    )
 
 
 def _handle_from_url(url: str) -> str:
@@ -56,19 +86,33 @@ def _verify_http(url: str) -> dict:
                 return r
         httpx = _compat
 
-    # Validate URL scheme before fetching (prevent file://, data://, etc.)
-    parsed_input = urlparse(url)
-    if parsed_input.scheme not in ("http", "https"):
-        return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": "invalid URL scheme"}
+    # SSRF gate: only ever fetch http(s) URLs on a known Carousell host. The
+    # decoded_url comes straight from a QR in an uploaded PDF (attacker-
+    # controlled), so an unrestricted fetch could hit internal IPs, cloud
+    # metadata, or localhost. A QR pointing anywhere else isn't a valid
+    # merchant link, so flag it "dead" instead of dereferencing it.
+    if not _is_verifiable_url(url):
+        return {"is_live": False, "qr_status": "dead", "resolves_to": "",
+                "detail": "QR points off Carousell (not verifiable)"}
 
     try:
+        # Follow redirects manually and re-validate each hop (a Carousell
+        # shortlink legitimately redirects to a profile, but one allowed hop
+        # must not be able to bounce the request off to an internal target).
         with httpx.Client(
-            follow_redirects=True,
-            max_redirects=5,
+            follow_redirects=False,
             timeout=20,
             headers={"User-Agent": _UA},
         ) as _client:
             resp = _client.get(url)
+            hops = 0
+            while getattr(resp, "is_redirect", False) and hops < 5:
+                nxt = str(resp.next_request.url) if resp.next_request else ""
+                if not _is_verifiable_url(nxt):
+                    return {"is_live": False, "qr_status": "dead", "resolves_to": "",
+                            "detail": "QR redirects off Carousell (not verifiable)"}
+                resp = _client.get(nxt)
+                hops += 1
     except Exception as e:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 

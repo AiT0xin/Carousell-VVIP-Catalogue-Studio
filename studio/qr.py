@@ -85,6 +85,40 @@ _UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 )
+
+# Only ever fetch URLs on the Carousell ecosystem. A QR decoded out of an
+# uploaded PDF is fully attacker-controlled, so without this gate the live
+# check would fetch *any* URL server-side (SSRF: internal IPs, cloud metadata,
+# localhost admin ports). A QR that points anywhere else isn't a valid merchant
+# link anyway, so we flag it "dead" instead of dereferencing it.
+_ALLOWED_VERIFY_DOMAINS = (
+    "carousell.sg",
+    "carousell.com",
+    "carousell.com.my",
+    "carousell.ph",
+    "caro.sl",
+)
+
+
+def _is_verifiable_url(url: str) -> bool:
+    """True only for http(s) URLs on a known Carousell host — blocks SSRF.
+
+    Matches a base domain exactly or as a proper subdomain (``host ==
+    domain`` or ``host.endswith("." + domain)``), so ``evilcarousell.sg``
+    and ``carousell.sg.attacker.com`` are both rejected.
+    """
+    try:
+        p = urlparse(url)
+    except Exception:
+        return False
+    if p.scheme not in ("http", "https"):
+        return False
+    host = (p.hostname or "").lower()
+    if not host:
+        return False
+    return any(
+        host == d or host.endswith("." + d) for d in _ALLOWED_VERIFY_DOMAINS
+    )
 _NOT_FOUND = re.compile(r"404 page|can'?t find the page|page not found", re.I)
 _CANONICAL = re.compile(
     r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']', re.I)
@@ -103,13 +137,26 @@ def _handle_from_url(url: str) -> str:
 
 
 def _http_verify(url: str) -> dict:
+    if not _is_verifiable_url(url):
+        return {"is_live": False, "qr_status": "dead", "resolves_to": "",
+                "detail": "QR points off Carousell (not verifiable)"}
     try:
         import httpx
-        # max_redirects is a Client argument, not a request argument — passing it to
-        # the module-level httpx.get() raises "get() got an unexpected keyword argument".
-        with httpx.Client(follow_redirects=True, max_redirects=5, timeout=20,
+        # Follow redirects *manually* and re-validate every hop. A Carousell
+        # shortlink (caro.sl) legitimately redirects to a profile, but auto-
+        # following would let a single allowed hop bounce the request off to an
+        # internal target — so each Location must itself pass _is_verifiable_url.
+        with httpx.Client(follow_redirects=False, timeout=20,
                           headers={"User-Agent": _UA}) as client:
             resp = client.get(url)
+            hops = 0
+            while resp.is_redirect and hops < 5:
+                nxt = str(resp.next_request.url) if resp.next_request else ""
+                if not _is_verifiable_url(nxt):
+                    return {"is_live": False, "qr_status": "dead", "resolves_to": "",
+                            "detail": "QR redirects off Carousell (not verifiable)"}
+                resp = client.get(nxt)
+                hops += 1
     except Exception as e:
         return {"is_live": False, "qr_status": "error", "resolves_to": "", "detail": str(e)}
 
@@ -132,16 +179,24 @@ def _http_verify(url: str) -> dict:
             "detail": f"http {resp.status_code}"}
 
 
-def _live_verify_inline(targets: list[MerchantRecord]) -> dict[str, dict]:
-    """HTTP-based verification — no subprocess, no browser, works in any sandbox."""
+def _live_verify_inline(targets: list[MerchantRecord],
+                        progress_cb: Optional[Callable] = None) -> dict[str, dict]:
+    """HTTP-based verification — no subprocess, no browser, works in any sandbox.
+
+    Live verification is the slow part (a throttled HTTP request per card), so it
+    drives the progress bar directly — otherwise the bar would sit at 0% for the
+    whole check and only jump at the end.
+    """
     results: dict[str, dict] = {}
-    for rec in targets:
-        if not rec.decoded_url:
-            continue
-        time.sleep(0.8)  # ToS-friendly throttle
-        row = _http_verify(rec.decoded_url)
-        row["handle"] = rec.handle
-        results[rec.handle] = row
+    n = len(targets)
+    for i, rec in enumerate(targets):
+        if rec.decoded_url:
+            time.sleep(0.8)  # ToS-friendly throttle
+            row = _http_verify(rec.decoded_url)
+            row["handle"] = rec.handle
+            results[rec.handle] = row
+        if progress_cb:
+            progress_cb(i + 1, n, rec)
     return results
 
 
@@ -156,10 +211,10 @@ def run_qrcheck(
 
     session.clear_changes("qrcheck")
 
-    # ── Live verification via isolated subprocess ────────────────────────────
+    # ── Live verification (drives the progress bar — the slow phase) ─────────
     live_results: dict[str, dict] = {}
     if do_live:
-        live_results = _live_verify_inline(targets)
+        live_results = _live_verify_inline(targets, progress_cb=progress_cb)
 
     # ── Classify each card ───────────────────────────────────────────────────
     class _Res:
@@ -188,7 +243,9 @@ def run_qrcheck(
             else:
                 rec.qr_status = _classify(rec, None)
 
-        if progress_cb:
+        # When live-verifying, the bar was already driven above; only drive it
+        # here for the offline path so we don't rewind it during classification.
+        if progress_cb and not do_live:
             progress_cb(i + 1, n, rec)
 
     # Emit replace-QR proposals for everything broken.
