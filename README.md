@@ -25,10 +25,11 @@ generic description. To enable AI descriptions, point the app at any
 OpenAI-compatible provider via env vars (pick a free one):
 
 ```bash
-# Ollama Cloud (free tier) — key from ollama.com
+# Ollama Cloud (free tier) — key from ollama.com/settings/keys
 export AI_BASE_URL=https://ollama.com/v1
 export AI_API_KEY=<your-ollama-key>
-export AI_MODEL=gpt-oss:120b
+export AI_MODEL=minimax-m3          # free & fast; nemotron-3-super also free
+                                    # (most other cloud models need a paid plan)
 
 # …or local Ollama (free, offline — run `ollama serve` and `ollama pull llama3.2`)
 export AI_BASE_URL=http://localhost:11434/v1
@@ -39,6 +40,9 @@ export AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 export AI_API_KEY=<your-gemini-key>
 export AI_MODEL=gemini-1.5-flash
 ```
+
+If the primary model errors or hits a free-tier limit, descriptions
+automatically retry with `AI_FALLBACK_MODEL` (default `nemotron-3-super`).
 
 Load a **catalogue PDF** + the **VVIP master sheet**, then work through three tabs.
 
