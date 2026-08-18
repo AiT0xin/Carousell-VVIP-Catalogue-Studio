@@ -6,8 +6,23 @@ from catbuilder.describer import (
     _is_sparse,
     _build_prompt,
     _SnippetParser,
+    _grounding_tokens,
+    _is_grounded,
 )
 from catbuilder.models import MerchantData
+
+# The real hallucination that shipped for @81.aircon — an image caption of a
+# random photo instead of a description of the aircon business. Kept as a
+# regression fixture so the guardrail can never let it through again.
+_HALLUCINATION = (
+    "A woman with dark hair pulled back leans toward the viewer with a lively, "
+    "mid-speech expression, her mouth open in a candid, easy laugh. She is dressed "
+    "in a solid black one-shoulder top, accessorized with large hoop earrings and a "
+    "delicate silver necklace. A dark flat-screen television is mounted on a plain "
+    "beige wall behind her."
+)
+_AIRCON_BIO = ("Assistance available for aircon setup and related concerns. "
+               "Includes complimentary site checks and old unit removal.")
 
 
 def test_ai_configured_with_cloud_key(monkeypatch):
@@ -39,6 +54,34 @@ def test_build_prompt_includes_all_context():
     prompt = _build_prompt(m, ["Brake pads", "Alloy wheels"], "extra web context")
     for needle in ("@foo", "Foo Co", "Autos", "Brake pads", "extra web context"):
         assert needle in prompt
+
+
+def test_grounding_tokens_from_name_and_bio():
+    m = MerchantData(handle="81.aircon", display_name="81.Aircon", category="Services")
+    tokens = _grounding_tokens(m, _AIRCON_BIO, [])
+    assert "aircon" in tokens          # from the name / handle
+    assert "setup" in tokens           # distinctive bio word
+    assert "services" not in tokens     # generic → stop-worded out
+    assert "81" not in tokens           # pure numbers dropped
+
+
+def test_guardrail_rejects_the_81aircon_hallucination():
+    m = MerchantData(handle="81.aircon", display_name="81.Aircon", category="Services")
+    tokens = _grounding_tokens(m, _AIRCON_BIO, [])
+    # the shipped hallucination mentions none of the merchant's words → rejected
+    assert _is_grounded(_HALLUCINATION, tokens) is False
+
+
+def test_guardrail_accepts_a_real_description():
+    m = MerchantData(handle="81.aircon", display_name="81.Aircon", category="Services")
+    tokens = _grounding_tokens(m, _AIRCON_BIO, [])
+    good = ("81.Aircon offers aircon setup, servicing, and old-unit removal with "
+            "complimentary site checks — message them to book.")
+    assert _is_grounded(good, tokens) is True
+
+
+def test_guardrail_does_not_over_reject_when_nothing_to_check():
+    assert _is_grounded("anything at all", set()) is True
 
 
 def test_snippet_parser_extracts_result_snippets():

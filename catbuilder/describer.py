@@ -28,6 +28,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -90,6 +91,44 @@ def _is_sparse(bio: str, listing_titles: list[str]) -> bool:
     useful_bio = len(bio.strip()) >= 30
     has_listings = len(listing_titles) >= 2
     return not useful_bio and not has_listings
+
+
+# ── Output guardrail ──────────────────────────────────────────────────────────
+# Generic words that carry no signal about *which* business this is, so they
+# don't count as the description being "about" the merchant.
+_GROUNDING_STOPWORDS = {
+    "singapore", "carousell", "vvip", "merchant", "profile", "user", "business",
+    "service", "services", "quality", "trusted", "offer", "offers", "visit",
+    "shop", "store", "best", "them", "their", "with", "that", "this", "here",
+    "from", "your", "have", "will", "and", "the", "for", "are", "you",
+}
+
+
+def _grounding_tokens(merchant, bio: str, listing_titles: list[str]) -> set[str]:
+    """Distinctive words a genuine description of THIS merchant should echo — its
+    name, handle, category, and content words from its bio / listings."""
+    tokens: set[str] = set()
+    strong = " ".join([merchant.display_name or "", merchant.handle or "",
+                       merchant.category or ""])
+    for w in re.split(r"[^a-z0-9]+", strong.lower()):
+        if len(w) >= 3 and not w.isdigit() and w not in _GROUNDING_STOPWORDS:
+            tokens.add(w)
+    text = (bio or "") + " " + " ".join(listing_titles or [])
+    for w in re.split(r"[^a-z0-9]+", text.lower()):
+        if len(w) >= 4 and not w.isdigit() and w not in _GROUNDING_STOPWORDS:
+            tokens.add(w)
+    return tokens
+
+
+def _is_grounded(description: str, tokens: set[str]) -> bool:
+    """True if the description echoes at least one distinctive token about the
+    merchant. A hallucinated, unrelated blurb (e.g. an image caption of a random
+    photo) echoes none of them and is rejected. With nothing to check against
+    (no name/bio at all) we don't over-reject."""
+    if not tokens:
+        return True
+    d = description.lower()
+    return any(t in d for t in tokens)
 
 
 # ── Web search fallback ───────────────────────────────────────────────────────
@@ -195,22 +234,35 @@ def generate_description(
     desc_dir.mkdir(parents=True, exist_ok=True)
     cache_file = desc_dir / f"{merchant.handle}.txt"
 
-    if cache_file.exists():
-        return cache_file.read_text().strip()
-
-    # Pull listing titles from the profile JSON cache
+    # Pull listing titles + bio from the profile JSON cache (for grounding + prompt)
     profile_cache = cache_dir / "profiles" / f"{merchant.handle}.json"
     listing_titles: list[str] = []
+    cached_bio = ""
     if profile_cache.exists():
         try:
             data = json.loads(profile_cache.read_text())
             listing_titles = data.get("listing_titles") or []
+            cached_bio = data.get("bio") or ""
         except Exception as e:
             _log.warning("could not read cached profile for @%s: %s", merchant.handle, e)
 
+    bio = (merchant.bio or "").strip() or cached_bio
+    tokens = _grounding_tokens(merchant, bio, listing_titles)
+
+    # Serve a cached description only if it still reads as being about this
+    # merchant. This self-heals a previously cached hallucination (e.g. the
+    # image-caption bug) instead of freezing it into every future catalogue.
+    if cache_file.exists():
+        cached = cache_file.read_text().strip()
+        if cached and _is_grounded(cached, tokens):
+            return cached
+        if cached:
+            _log.warning("discarding cached off-topic description for @%s; regenerating",
+                         merchant.handle)
+
     # Web search if the Carousell profile alone is too sparse
     web_context = ""
-    if _is_sparse(merchant.bio, listing_titles):
+    if _is_sparse(bio, listing_titles):
         name = merchant.display_name or merchant.handle
         query = f"{name} Singapore {merchant.category or ''}".strip()
         web_context = _web_search(query)
@@ -239,11 +291,19 @@ def generate_description(
             # cap returns an empty string. Non-reasoning models just stop early.
             resp = client.chat.completions.create(
                 model=cand, max_tokens=2000, messages=messages)
-            description = (resp.choices[0].message.content or "").strip()
-            if description:
-                break
-            _log.warning("model %r returned an empty description for @%s",
-                         cand, merchant.handle)
+            candidate_text = (resp.choices[0].message.content or "").strip()
+            if not candidate_text:
+                _log.warning("model %r returned an empty description for @%s",
+                             cand, merchant.handle)
+                continue
+            # Guardrail: reject an output that says nothing about this merchant
+            # (the image-caption hallucination). Fall through to the next model.
+            if not _is_grounded(candidate_text, tokens):
+                _log.warning("model %r produced an off-topic description for @%s; "
+                             "discarding and trying next candidate", cand, merchant.handle)
+                continue
+            description = candidate_text
+            break
         except Exception as e:  # noqa: BLE001 — try the next candidate
             last_err = e
             _log.warning("model %r failed for @%s: %s — trying next candidate",
