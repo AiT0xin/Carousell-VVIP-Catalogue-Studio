@@ -7,10 +7,9 @@ endpoints, or localhost admin ports. A QR that points anywhere off the Carousell
 ecosystem isn't a valid merchant link anyway, so callers flag it "dead" rather
 than fetching it.
 
-Both the in-process verifier (studio/qr.py) and the isolated subprocess worker
-(studio/qr_worker.py) import from here, so the allowlist can never drift between
-them. Keep this module dependency-light (stdlib only) so the subprocess worker
-stays cheap to import.
+The QR verifier (studio/qr.py) imports from here — the one place the allowlist
+and its matching logic are defined, so there is no second copy to drift out of
+sync. Kept dependency-light (stdlib only) so any caller stays cheap to import.
 """
 from __future__ import annotations
 

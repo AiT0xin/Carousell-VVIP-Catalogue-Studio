@@ -15,6 +15,9 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from studio import __version__ as _APP_VERSION
+# Footer shows the major version (e.g. "v5"); single-sourced from studio/__init__.py.
+APP_VERSION_LABEL = f"v{_APP_VERSION.split('.')[0]}"
 from studio.crosscheck import run_crosscheck, crosscheck_summary
 from studio.qr import run_qrcheck
 from studio.generate import generate_plan, generate
@@ -1602,7 +1605,7 @@ section[data-testid="stSidebar"] [data-testid="stButton"] button:hover {
 """, unsafe_allow_html=True)
     _, col, _ = st.columns([1, 2, 1])
     with col:
-        if st.button("↺  Start over", key="reset_session", use_container_width=False):
+        if st.button("↺  Start over", key="reset_session", width="content"):
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             st.rerun()
@@ -1709,7 +1712,7 @@ if not ready:
 </div>
     """, unsafe_allow_html=True)
 
-    st.image(str(Path(__file__).resolve().parent / "studio" / "static" / "features_grid.png"), use_container_width=True)
+    st.image(str(Path(__file__).resolve().parent / "studio" / "static" / "features_grid.png"), width="stretch")
 
     st.markdown("""
     <div style="padding:8px 0;"></div>
@@ -1841,7 +1844,7 @@ def approval_editor(changes: list[ProposedChange], key: str) -> None:
         "Why": c.reason,
     } for c in changes])
     edited = st.data_editor(
-        df, key=key, hide_index=True, use_container_width=True,
+        df, key=key, hide_index=True, width="stretch",
         height=561,
         disabled=["Action", "Handle", "Merchant", "Why"],
         column_config={"Approve": st.column_config.CheckboxColumn(width="small")},
@@ -1961,7 +1964,7 @@ with tab1:
             "Action": _BADGE.get(x.cc_status, x.cc_status),
             "Pg": str(x.page) if x.page else "",
         } for x in sorted(sess.merchants, key=lambda r: (r.cc_status, r.handle))]
-        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True,
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
                      height=561)
 
         st.markdown("##### Proposed changes - approve to apply")
@@ -2079,7 +2082,7 @@ with tab2:
                 "Pg": str(x.page) if x.page else "",
             } for x in sorted(cards, key=lambda r: (r.qr_ok, r.handle))]
             st.dataframe(pd.DataFrame(rows), hide_index=True,
-                         use_container_width=True, height=561)
+                         width="stretch", height=561)
 
             st.markdown("##### Broken QRs - approve to regenerate")
             qr_changes = [c for c in sess.changes if c.source == "qrcheck"]
@@ -2237,7 +2240,7 @@ with tab3:
                     st.download_button("Download corrected PDF", f.read(),
                                        file_name=out.name,
                                        mime="application/pdf",
-                                       use_container_width=True)
+                                       width="stretch")
                 # preview first pages
                 try:
                     import pypdfium2 as pdfium
@@ -2246,7 +2249,7 @@ with tab3:
                     st.caption(f"Preview ({len(pages)} page(s))")
                     for i, pg in enumerate(pages[:4]):
                         st.image(pg.render(scale=1.4).to_pil(),
-                                 use_container_width=True)
+                                 width="stretch")
                 except Exception:
                     pass
 
@@ -2261,12 +2264,12 @@ div.tos-footer span { font-size:8px; color:rgba(0,0,0,0.3); letter-spacing:0.05e
   height:auto !important; min-height:0 !important; box-shadow:none !important;
 }
 </style>
-<div class="tos-footer"><span>© 2026 Owin Tan · Vibe Coded with Claude Code · v5</span></div>
-""", unsafe_allow_html=True)
+<div class="tos-footer"><span>© 2026 Owin Tan · Vibe Coded with Claude Code · @@VER@@</span></div>
+""".replace("@@VER@@", APP_VERSION_LABEL), unsafe_allow_html=True)
 
 _, mid, _ = st.columns([3, 1, 3])
 with mid:
-    if st.button("Terms of Use", key="tos_btn_footer", use_container_width=True):
+    if st.button("Terms of Use", key="tos_btn_footer", width="stretch"):
         _show_tos()
 
 st.markdown('<div style="height:32px;"></div>', unsafe_allow_html=True)

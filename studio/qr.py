@@ -27,7 +27,7 @@ from .sources import (
     normalize_handle,
     profile_url_for,
 )
-# Single source of truth for the SSRF allowlist (shared with qr_worker.py).
+# Single source of truth for the SSRF allowlist + matcher (studio/ssrf.py).
 from .ssrf import (
     ALLOWED_VERIFY_DOMAINS as _ALLOWED_VERIFY_DOMAINS,
     is_verifiable_url as _is_verifiable_url,
