@@ -1250,7 +1250,7 @@ sess: StudioSession = st.session_state.sess
 def _show_tos():
     st.markdown("""
 **VVIP E-Catalogue Studio — Terms of Use**
-*Last updated: 17 August 2026*
+*Last updated: 18 August 2026*
 
 By accessing, installing, running, or otherwise using this Software, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use ("Terms") in their entirety. If you do not agree, do not use the Software.
 
@@ -1270,7 +1270,7 @@ You are solely responsible for any files, spreadsheets, images, PDFs, URLs, cred
 
 **4. Third-Party Services and Platforms**
 
-The Software may, at your direction, interact with third-party services and platforms (including but not limited to Carousell websites and the Anthropic API). Your use of any such third-party service is governed solely by that service's own terms of service, acceptable-use policies, and applicable laws. You are solely responsible for ensuring that your use of the Software — including any automated access, retrieval, verification, or processing of publicly available information — complies with those terms and with all applicable laws and regulations. The Developer does not endorse, control, or assume any responsibility for any third-party service, its availability, or the consequences of your use of it.
+The Software may, at your direction, interact with third-party services and platforms (including but not limited to Carousell websites and third-party AI providers, such as any OpenAI-compatible endpoint, Ollama, or Google Gemini, that you choose to configure). Your use of any such third-party service is governed solely by that service's own terms of service, acceptable-use policies, and applicable laws. You are solely responsible for ensuring that your use of the Software — including any automated access, retrieval, verification, or processing of publicly available information — complies with those terms and with all applicable laws and regulations. The Developer does not endorse, control, or assume any responsibility for any third-party service, its availability, or the consequences of your use of it.
 
 **5. Acceptable Use and Assumption of Risk**
 
@@ -1319,6 +1319,12 @@ These Terms constitute the entire agreement between you and the Developer regard
 **16. Governing Law and Jurisdiction**
 
 These Terms shall be governed by and construed in accordance with the laws of the Republic of Singapore, without regard to its conflict-of-laws principles. You agree to submit to the exclusive jurisdiction of the courts of Singapore in respect of any dispute arising out of or in connection with these Terms or the Software.
+
+**17. Quality Management and Standards Alignment**
+
+The Software's development lifecycle is maintained in alignment with the principles of ISO 9001:2015 (Quality Management Systems) as a matter of the Developer's internal quality discipline. This includes documented requirements with acceptance criteria, an automated test suite executed on every change through continuous integration, controlled and reproducible releases, defined and measurable quality objectives, structured logging of processing failures, and a maintained nonconformity and corrective-action log. Supporting quality documentation is maintained in the Software's repository.
+
+This alignment is a good-faith internal self-assessment only. It does **not** constitute certification, registration, audit, or endorsement by the International Organization for Standardization (ISO), by any accredited certification body, or by any other authority, and no such certification is claimed or implied. Nothing in this Section creates any warranty, representation, guarantee, or obligation of any kind as to the quality, accuracy, reliability, fitness, security, or conformance of the Software or its outputs, and this Section is expressly subject to, and in no way limits, Sections 5 (Acceptable Use and Assumption of Risk), 8 (No Warranty), and 9 (Limitation of Liability).
 
 ---
 
