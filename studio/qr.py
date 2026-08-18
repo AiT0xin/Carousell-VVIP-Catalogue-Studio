@@ -27,6 +27,11 @@ from .sources import (
     normalize_handle,
     profile_url_for,
 )
+# Single source of truth for the SSRF allowlist (shared with qr_worker.py).
+from .ssrf import (
+    ALLOWED_VERIFY_DOMAINS as _ALLOWED_VERIFY_DOMAINS,
+    is_verifiable_url as _is_verifiable_url,
+)
 from .state import (
     StudioSession,
     MerchantRecord,
@@ -86,39 +91,9 @@ _UA = (
     "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 )
 
-# Only ever fetch URLs on the Carousell ecosystem. A QR decoded out of an
-# uploaded PDF is fully attacker-controlled, so without this gate the live
-# check would fetch *any* URL server-side (SSRF: internal IPs, cloud metadata,
-# localhost admin ports). A QR that points anywhere else isn't a valid merchant
-# link anyway, so we flag it "dead" instead of dereferencing it.
-_ALLOWED_VERIFY_DOMAINS = (
-    "carousell.sg",
-    "carousell.com",
-    "carousell.com.my",
-    "carousell.ph",
-    "caro.sl",
-)
-
-
-def _is_verifiable_url(url: str) -> bool:
-    """True only for http(s) URLs on a known Carousell host — blocks SSRF.
-
-    Matches a base domain exactly or as a proper subdomain (``host ==
-    domain`` or ``host.endswith("." + domain)``), so ``evilcarousell.sg``
-    and ``carousell.sg.attacker.com`` are both rejected.
-    """
-    try:
-        p = urlparse(url)
-    except Exception:
-        return False
-    if p.scheme not in ("http", "https"):
-        return False
-    host = (p.hostname or "").lower()
-    if not host:
-        return False
-    return any(
-        host == d or host.endswith("." + d) for d in _ALLOWED_VERIFY_DOMAINS
-    )
+# SSRF allowlist + is_verifiable_url() live in studio/ssrf.py so this module and
+# the subprocess worker share one definition that can't drift. Imported above as
+# _ALLOWED_VERIFY_DOMAINS / _is_verifiable_url.
 _NOT_FOUND = re.compile(r"404 page|can'?t find the page|page not found", re.I)
 _CANONICAL = re.compile(
     r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']', re.I)

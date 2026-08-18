@@ -22,6 +22,13 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+# Single source of truth for the SSRF allowlist (shared with studio/qr.py).
+# studio/ssrf is stdlib-only, so importing it keeps this subprocess cheap.
+from studio.ssrf import (  # noqa: E402
+    ALLOWED_VERIFY_DOMAINS as _ALLOWED_VERIFY_DOMAINS,
+    is_verifiable_url as _is_verifiable_url,
+)
+
 _UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
@@ -30,36 +37,6 @@ _NOT_FOUND = re.compile(r"404 page|can'?t find the page|page not found", re.I)
 _CANONICAL = re.compile(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']', re.I)
 _OG_URL    = re.compile(r'<meta[^>]+property=["\']og:url["\'][^>]+content=["\']([^"\']+)["\']', re.I)
 _GENERIC_TITLE = "carousell - snap to list, chat to buy"
-
-# SSRF allowlist — kept in sync with studio/qr.py. Duplicated (not imported) so
-# this subprocess stays import-isolated from the rest of the studio package.
-_ALLOWED_VERIFY_DOMAINS = (
-    "carousell.sg",
-    "carousell.com",
-    "carousell.com.my",
-    "carousell.ph",
-    "caro.sl",
-)
-
-
-def _is_verifiable_url(url: str) -> bool:
-    """True only for http(s) URLs on a known Carousell host — blocks SSRF.
-
-    Matches a base domain exactly or as a proper subdomain, so lookalikes
-    like ``evilcarousell.sg`` and ``carousell.sg.attacker.com`` are rejected.
-    """
-    try:
-        p = urlparse(url)
-    except Exception:
-        return False
-    if p.scheme not in ("http", "https"):
-        return False
-    host = (p.hostname or "").lower()
-    if not host:
-        return False
-    return any(
-        host == d or host.endswith("." + d) for d in _ALLOWED_VERIFY_DOMAINS
-    )
 
 
 def _handle_from_url(url: str) -> str:
