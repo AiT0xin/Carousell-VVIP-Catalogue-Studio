@@ -6,8 +6,10 @@ enough to build a card: display name, avatar, and a seed description. This
 replaces the Playwright scraper in `catbuilder.fetcher` for environments where
 Chromium can't launch (e.g. the preview sandbox).
 
-Listing thumbnails are JS-rendered and therefore not available here; cards fall
-back to the avatar + brand tint, which the PDF renderer already handles.
+Listing *titles* are harvested from the server-rendered JSON in the page (see
+_extract_listing_titles) so the describer knows what the merchant sells. Listing
+*thumbnails* are still JS-rendered and not available here; cards fall back to the
+avatar + brand tint, which the PDF renderer already handles.
 """
 from __future__ import annotations
 
@@ -64,6 +66,43 @@ def _clean_name(og_title: str, handle: str) -> str:
     return name
 
 
+# Carousell server-renders its listing cards into the page as escaped JSON, so we
+# can harvest listing *titles* without a browser — enough to tell the describer
+# what the merchant actually sells. This reads an undocumented internal shape, so
+# it is strictly best-effort: any failure just yields an empty list.
+_TITLE_RE = re.compile(r'"title"\s*:\s*"((?:[^"\\]|\\.){4,120})"')
+_LISTING_CHROME = {
+    "recommended", "recently viewed", "you may also like", "similar listings",
+    "featured", "categories", "search", "home", "carousell",
+}
+
+
+def _extract_listing_titles(html: str, limit: int = 6) -> list[str]:
+    """Best-effort harvest of this seller's listing titles from the static HTML.
+
+    Chrome labels (nav, "Recommended", etc.) are filtered out; the seller's own
+    listings render first, so the early matches we keep are theirs.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in _TITLE_RE.findall(html):
+        try:
+            title = json.loads('"' + raw + '"')  # unescape /, \/, emojis
+        except Exception:
+            continue
+        title = title.strip()
+        key = title.lower()
+        if len(title) < 5 or key in _LISTING_CHROME or key in seen:
+            continue
+        if any(w in key for w in ("sign up", "log in", "download the app")):
+            continue
+        seen.add(key)
+        out.append(title)
+        if len(out) >= limit:
+            break
+    return out
+
+
 def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> Optional[dict]:
     """Fetch + cache profile fields via static HTML. None if the handle is dead."""
     cache_dir = Path(cache_dir)
@@ -86,7 +125,8 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
     if resp.status_code == 404:
         return None
 
-    html = (resp.text or "")[:500_000]  # cap HTML size before regex
+    full = resp.text or ""
+    html = full[:500_000]  # head meta (og:*, description) is early — cap is fine here
     og_title = _meta(html, "og:title")
     if not og_title:
         # No server-rendered profile head → treat as dead/unresolvable.
@@ -102,7 +142,9 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
         "bio": description_meta,
         "avatar_url": _meta(html, "og:image"),
         "seller_tier": tier_m.group(1) if tier_m else "",
-        "listing_titles": [],
+        # Listing cards render later in the body (often past 500 KB), so scan a
+        # larger slice — the regex is linear and output is capped at 6.
+        "listing_titles": _extract_listing_titles(full[:2_000_000]),
         "listing_image_urls": [],
     }
 
