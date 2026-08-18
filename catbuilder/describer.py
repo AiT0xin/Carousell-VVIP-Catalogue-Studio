@@ -38,6 +38,10 @@ from .models import MerchantData
 # pulled. Override any of these via env vars to use a cloud provider.
 _DEFAULT_BASE_URL = "http://localhost:11434/v1"
 _DEFAULT_MODEL = "llama3.2"
+# If the primary model errors (e.g. a free-tier quota/rate limit) or returns
+# nothing, retry with this one before giving up. Set AI_FALLBACK_MODEL="" to
+# disable, or to another model name to change it.
+_DEFAULT_FALLBACK_MODEL = "nemotron-3-super"
 
 _CLIENT = None
 
@@ -205,18 +209,40 @@ def generate_description(
 
     client = _get_client()
     prompt = _build_prompt(merchant, listing_titles, web_context)
-    # Generous ceiling: reasoning models (e.g. nemotron) spend most of their
-    # budget "thinking" and only then emit the answer, so a low cap returns an
-    # empty string. Non-reasoning models just stop early — no extra cost.
-    resp = client.chat.completions.create(
-        model=model,
-        max_tokens=2000,
-        messages=[
-            {"role": "system", "content": _SYSTEM},
-            {"role": "user", "content": prompt},
-        ],
-    )
-    description = (resp.choices[0].message.content or "").strip()
-    if description:
-        cache_file.write_text(description)
+    messages = [
+        {"role": "system", "content": _SYSTEM},
+        {"role": "user", "content": prompt},
+    ]
+
+    # Try the primary model, then fall back to a secondary one if it errors
+    # (e.g. a free-tier quota/rate limit) or returns nothing. Only when every
+    # candidate fails do we raise, letting the caller use a generic description.
+    fallback = os.environ.get("AI_FALLBACK_MODEL", _DEFAULT_FALLBACK_MODEL)
+    candidates = [model]
+    if fallback and fallback != model:
+        candidates.append(fallback)
+
+    description = ""
+    last_err: Exception | None = None
+    for cand in candidates:
+        try:
+            # Generous ceiling: reasoning models (nemotron, minimax) spend most
+            # of their budget "thinking" and only then emit the answer, so a low
+            # cap returns an empty string. Non-reasoning models just stop early.
+            resp = client.chat.completions.create(
+                model=cand, max_tokens=2000, messages=messages)
+            description = (resp.choices[0].message.content or "").strip()
+            if description:
+                break
+        except Exception as e:  # noqa: BLE001 — try the next candidate
+            last_err = e
+            continue
+
+    if not description:
+        raise RuntimeError(
+            f"AI description failed for @{merchant.handle} "
+            f"(tried: {', '.join(candidates)})"
+        ) from last_err
+
+    cache_file.write_text(description)
     return description
