@@ -1,0 +1,4 @@
+# Development / CI dependencies (not needed to run the app itself).
+# Installs the app requirements too so the test suite can import every module.
+-r requirements.txt
+pytest>=8.0.0

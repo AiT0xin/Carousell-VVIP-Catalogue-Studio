@@ -26,6 +26,7 @@ Delete that file to force a fresh generation.
 from __future__ import annotations
 
 import json
+import logging
 import os
 from html.parser import HTMLParser
 from pathlib import Path
@@ -33,6 +34,11 @@ from pathlib import Path
 import httpx
 
 from .models import MerchantData
+
+# Module logger. Failures that degrade output (a cached profile that won't parse,
+# a web-search miss, a model that errors) are recorded here rather than swallowed
+# silently, so a bad description can be traced instead of appearing from nowhere.
+_log = logging.getLogger(__name__)
 
 # Default to local Ollama so the app works offline with no key once a model is
 # pulled. Override any of these via env vars to use a cloud provider.
@@ -130,12 +136,14 @@ def _web_search(query: str) -> str:
             follow_redirects=True,
         )
         if resp.status_code != 200:
+            _log.debug("web search returned HTTP %s for %r", resp.status_code, query)
             return ""
         parser = _SnippetParser()
         parser.feed(resp.text)
         snippets = parser.snippets[:3]
         return " | ".join(snippets)
-    except Exception:
+    except Exception as e:
+        _log.debug("web search failed for %r: %s", query, e)
         return ""
 
 
@@ -197,8 +205,8 @@ def generate_description(
         try:
             data = json.loads(profile_cache.read_text())
             listing_titles = data.get("listing_titles") or []
-        except Exception:
-            pass
+        except Exception as e:
+            _log.warning("could not read cached profile for @%s: %s", merchant.handle, e)
 
     # Web search if the Carousell profile alone is too sparse
     web_context = ""
@@ -234,11 +242,17 @@ def generate_description(
             description = (resp.choices[0].message.content or "").strip()
             if description:
                 break
+            _log.warning("model %r returned an empty description for @%s",
+                         cand, merchant.handle)
         except Exception as e:  # noqa: BLE001 — try the next candidate
             last_err = e
+            _log.warning("model %r failed for @%s: %s — trying next candidate",
+                         cand, merchant.handle, e)
             continue
 
     if not description:
+        _log.error("AI description failed for @%s (tried: %s)",
+                   merchant.handle, ", ".join(candidates))
         raise RuntimeError(
             f"AI description failed for @{merchant.handle} "
             f"(tried: {', '.join(candidates)})"

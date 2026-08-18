@@ -91,6 +91,25 @@ Engines reused as-is (vendored at the repo root, not external packages):
 - **qrcheck/** — PDF extraction, master ingest, live verify
 - **catbuilder/** — profile fetch, describe, QR gen, PDF render
 
+## Testing & quality
+
+Run the test suite (50 network-free unit tests over the critical paths — SSRF
+guard, handle/URL normalization, QR verdict logic, master ingest, cross-check,
+descriptions, and the `.env` loader):
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+CI runs the same suite on every push and pull request to `main`
+(`.github/workflows/ci.yml`) — a red suite blocks the change. The project keeps a
+lightweight ISO 9001-aligned quality system under `docs/`:
+
+- [docs/QUALITY.md](docs/QUALITY.md) — quality policy, measurable objectives, release process
+- [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) — requirements + acceptance criteria, traced to tests
+- [docs/NONCONFORMITY_LOG.md](docs/NONCONFORMITY_LOG.md) — defect / corrective-action log
+
 The Playwright-backed stages (live QR check, profile fetch) run on a **background
 thread** inside the Streamlit process — sync Playwright can't `start()` on a thread
 that already has a running asyncio loop, so a fresh thread sidesteps it. No

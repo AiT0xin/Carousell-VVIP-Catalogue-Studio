@@ -32,32 +32,11 @@ from studio.state import (
 
 PROJECT_ROOT = Path(__file__).parent
 
-
-def _load_dotenv() -> None:
-    """Load AI_* (and any other) settings from a project-root .env into the
-    environment, so the app works no matter how it was launched.
-
-    The Streamlit process is started via `sh -c` (see .claude/launch.json and
-    the deploy runner), which does NOT source ~/.zshrc — so shell exports never
-    reach it and the AI toggle would stay disabled. Reading .env here fixes that
-    without leaking secrets (.env is gitignored). Existing real env vars win, so
-    a shell export or a hosting provider's secrets panel still takes precedence.
-    """
-    env_file = PROJECT_ROOT / ".env"
-    if not env_file.exists():
-        return
-    for line in env_file.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        key = key.strip()
-        val = val.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = val
-
-
-_load_dotenv()
+# Load AI_* (and any other) settings from a gitignored .env so the app works no
+# matter how it was launched (the sh -c launcher never sources ~/.zshrc). Real
+# env vars still win. See studio/env.py.
+from studio.env import load_dotenv
+load_dotenv(PROJECT_ROOT)
 
 st.set_page_config(page_title="VVIP Catalogue Studio", layout="wide")
 
