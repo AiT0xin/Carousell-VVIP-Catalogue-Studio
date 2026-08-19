@@ -181,6 +181,31 @@ def _fit_crop_buf(img_path: Path, w: int, h: int) -> Optional[io.BytesIO]:
 
 # ── Drawing helpers ────────────────────────────────────────────────────────────
 
+# Smart punctuation the embedded fonts have no glyph for — LLM output loves
+# non-breaking hyphens and em-dashes, which otherwise render as a tofu box.
+_PUNCT_MAP = {
+    "‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-",
+    "―": "-", "−": "-",
+    "‘": "'", "’": "'", "‚": "'", "‛": "'",
+    "“": '"', "”": '"', "„": '"',
+    "…": "...", "•": "-",
+    " ": " ", " ": " ", " ": " ", " ": " ",
+    " ": " ", " ": " ",
+}
+
+
+def _ascii(text: str) -> str:
+    """Map smart punctuation to ASCII and drop symbols/emoji the PDF font lacks,
+    so drawn text never falls back to a tofu box."""
+    if not text:
+        return text
+    for k, v in _PUNCT_MAP.items():
+        if k in text:
+            text = text.replace(k, v)
+    # Drop remaining high-plane symbols / dingbats / emoji (e.g. a stray ✅).
+    return "".join(ch for ch in text if ord(ch) < 0x2100)
+
+
 def _draw_wrapped_text(
     c: rl_canvas.Canvas,
     text: str,
@@ -194,6 +219,7 @@ def _draw_wrapped_text(
 ) -> None:
     if not text:
         return
+    text = _ascii(text)
     lh = line_height or font_size * 1.45
     words = text.split()
     lines: list[str] = []
@@ -364,7 +390,7 @@ def _draw_card(
     )
 
     # ── Display name ───────────────────────────────────────────────────────
-    disp = (merchant.display_name or merchant.handle.title())[:40]
+    disp = _ascii(merchant.display_name or merchant.handle.title())[:40]
     c.setFont(BOLD, 11)
     c.setFillColor(_DARK)
     c.drawString(card_x + _ID_X, card_top_y - _DISPNAME_Y_REL - 11, disp)
