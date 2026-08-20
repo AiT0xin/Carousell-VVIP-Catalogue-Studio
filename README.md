@@ -119,7 +119,7 @@ subprocess required.
 
 ## Notes / environment
 
-- **AI descriptions** need an OpenAI-compatible provider configured via
+- **AI descriptions** need a compatible provider configured via
   `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` (see the free options above); without
   it, cards get a generic description (toggle is disabled).
 - **macOS sandbox**: if launched in a restricted sandbox, files under `~/Downloads`
