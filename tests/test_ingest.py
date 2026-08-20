@@ -18,7 +18,7 @@ def test_category_from_pdf_name():
 
 
 def test_looks_like_handle():
-    assert _looks_like_handle("motordez")
+    assert _looks_like_handle("acmemotors")
     assert _looks_like_handle("the.car_shop")
     assert not _looks_like_handle("pte")        # corporate blocklist
     assert not _looks_like_handle("12345")      # all digits
@@ -27,16 +27,16 @@ def test_looks_like_handle():
 
 
 def test_biz_name_to_handle():
-    assert _biz_name_to_handle("JSS MOTORWORKZ PTE LTD") == "jssmotorworkz"
-    assert _biz_name_to_handle("Awesome Tints") == "awesometints"
+    assert _biz_name_to_handle("ACME MOTORWORKS PTE LTD") == "acmemotorworks"
+    assert _biz_name_to_handle("Acme Tints") == "acmetints"
     # collapses past the 35-char handle ceiling → not a usable handle
     assert _biz_name_to_handle("A Really Long Descriptive Company Name Here") is None
 
 
 def test_harvest_single_and_multi():
-    assert _harvest_handles("motorydez") == ["motorydez"]
-    got = set(_harvest_handles("isellcarshades /Thecarstuffs.com"))
-    assert got == {"isellcarshades", "thecarstuffs.com"}
+    assert _harvest_handles("acmemotors") == ["acmemotors"]
+    got = set(_harvest_handles("acmecarshades /Acmecarparts.com"))
+    assert got == {"acmecarshades", "acmecarparts.com"}
 
 
 def test_harvest_skips_banner():
@@ -50,9 +50,9 @@ def test_load_master_from_csv(tmp_path):
         "SG VVIP Merchants,,\n"
         "Merchants as of June,,\n"
         ",,\n"
-        "JSS Motorworkz Pte Ltd,jssmotorworkz,\n"
-        "Awesome Tints,awesometints,\n"
+        "ACME Motorworks Pte Ltd,acmemotorworks,\n"
+        "Acme Tints,acmetints,\n"
     )
     mt = load_master(str(csv))
-    assert {"jssmotorworkz", "awesometints"} <= mt.handles
+    assert {"acmemotorworks", "acmetints"} <= mt.handles
     assert len(mt) >= 2

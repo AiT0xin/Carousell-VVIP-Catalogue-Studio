@@ -2,8 +2,8 @@
 
 Usage:
   catbuild --master XLSX --category AUTOS --out catalogue.pdf
-  catbuild --handles motordez revologybikes --category "Autos" --cat-label "Car Parts & Accessories" --out test.pdf
-  catbuild --handles motordez --no-fetch --no-describe --out test.pdf   # offline test
+  catbuild --handles acmemotors acmebrandsg --category "Autos" --cat-label "Car Parts & Accessories" --out test.pdf
+  catbuild --handles acmemotors --no-fetch --no-describe --out test.pdf   # offline test
 """
 from __future__ import annotations
 

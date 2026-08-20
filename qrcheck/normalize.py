@@ -72,8 +72,8 @@ def is_shortlink(url: str | None) -> bool:
 def handle_from_profile_url(url: str | None) -> str | None:
     """Return the normalized handle if `url` is a merchant profile link, else None.
 
-    >>> handle_from_profile_url("https://www.carousell.sg/u/motorydez/")
-    'motorydez'
+    >>> handle_from_profile_url("https://www.carousell.sg/u/acmemotors/")
+    'acmemotors'
     >>> handle_from_profile_url("https://college.carousell.com/top-auto-merchants/")
     None
     """
@@ -86,7 +86,7 @@ def handle_from_profile_url(url: str | None) -> str | None:
     m = _PROFILE_PATH_RE.match(p.path)
     if m:
         return normalize_handle(m.group("handle"))
-    # Bare /<handle> form (carousell.com/thegamebrosg), excluding site sections.
+    # Bare /<handle> form (carousell.com/acmegamestore), excluding site sections.
     m = _BARE_PATH_RE.match(p.path)
     if m and m.group("handle").lower() not in _RESERVED_SEGMENTS:
         return normalize_handle(m.group("handle"))

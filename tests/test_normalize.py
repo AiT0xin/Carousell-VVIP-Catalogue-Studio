@@ -13,7 +13,7 @@ from qrcheck.models import QRClass
 
 
 def test_normalize_handle():
-    assert normalize_handle("@Motordez ") == "motordez"
+    assert normalize_handle("@AcmeMotors ") == "acmemotors"
     assert normalize_handle("  @ABC.def_ ") == "abc.def_"
     assert normalize_handle(None) == ""
     assert normalize_handle("") == ""
@@ -22,13 +22,13 @@ def test_normalize_handle():
 
 
 def test_handle_from_profile_url_canonical():
-    assert handle_from_profile_url("https://www.carousell.sg/u/motorydez/") == "motorydez"
+    assert handle_from_profile_url("https://www.carousell.sg/u/acmemotors/") == "acmemotors"
     assert handle_from_profile_url("https://carousell.sg/u/Foo/") == "foo"
 
 
 def test_handle_from_profile_url_bare_path():
     # carousell.com/<handle> without /u/
-    assert handle_from_profile_url("https://www.carousell.com/thegamebrosg") == "thegamebrosg"
+    assert handle_from_profile_url("https://www.carousell.com/acmegamestore") == "acmegamestore"
 
 
 def test_handle_from_profile_url_rejects_non_profiles():

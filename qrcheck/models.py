@@ -68,7 +68,7 @@ class PrintedHandle:
 
     page: int
     text: str           # normalized handle, no leading '@'
-    raw: str            # exactly as printed, e.g. "@motordez"
+    raw: str            # exactly as printed, e.g. "@acmemotors"
     box: BBox
 
 

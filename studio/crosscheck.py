@@ -13,9 +13,9 @@ Removals and additions are emitted as ProposedChange rows for the user to
 approve before Feature 3 applies them.
 
 Handle matching is fuzzy on purpose: the master sheet often stores *business
-names* that get derived down to a stem ("revology") while the catalogue shows
-the real handle ("revologybikes"). A prefix match (min 5 chars) bridges those so
-we don't simultaneously propose "remove revologybikes" and "add revology".
+names* that get derived down to a stem ("acmebrand") while the catalogue shows
+the real handle ("acmebrandsg"). A prefix match (min 5 chars) bridges those so
+we don't simultaneously propose "remove acmebrandsg" and "add acmebrand".
 """
 from __future__ import annotations
 

@@ -18,85 +18,90 @@ playwright install chromium        # one-time, for QR live-verify + profile fetc
 streamlit run app.py
 ```
 
-This opens the app in your browser at `http://localhost:8501`, running
-entirely on your own machine — uploaded PDFs and sheets never leave your
-computer.
+This opens the app in your browser at `http://localhost:8501`. Everything runs on
+your own machine, and uploaded PDFs and sheets never leave your computer.
 
-Optional — AI-written merchant descriptions. Without any config, cards use a
-generic description. To enable AI descriptions, point the app at any
-OpenAI-compatible provider via env vars (pick a free one):
+### Optional: AI-written merchant descriptions
+
+Without any configuration, cards use a generic description. To turn on AI
+descriptions, point the app at an AI provider. It works with any of several:
+Ollama Cloud, a local Ollama install, Google Gemini, or any service that exposes
+an OpenAI-compatible chat API. "OpenAI-compatible" refers to the request format,
+which is a common standard; it does not mean you need OpenAI itself. Pick a free
+option and set it with environment variables:
 
 ```bash
-# Ollama Cloud (free tier) — key from ollama.com/settings/keys
+# Ollama Cloud (free tier). Key from ollama.com/settings/keys
 export AI_BASE_URL=https://ollama.com/v1
 export AI_API_KEY=<your-ollama-key>
-export AI_MODEL=minimax-m3          # free & fast; nemotron-3-super also free
+export AI_MODEL=minimax-m3          # free and fast; nemotron-3-super is also free
                                     # (most other cloud models need a paid plan)
 
-# …or local Ollama (free, offline — run `ollama serve` and `ollama pull llama3.2`)
+# Local Ollama (free, offline). Run `ollama serve` and `ollama pull llama3.2`
 export AI_BASE_URL=http://localhost:11434/v1
 export AI_MODEL=llama3.2            # no key needed
 
-# …or Google Gemini (free tier) — key from aistudio.google.com/app/apikey
+# Google Gemini (free tier). Key from aistudio.google.com/app/apikey
 export AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 export AI_API_KEY=<your-gemini-key>
 export AI_MODEL=gemini-1.5-flash
 ```
 
-If the primary model errors or hits a free-tier limit, descriptions
-automatically retry with `AI_FALLBACK_MODEL` (default `nemotron-3-super`).
+If the primary model errors or hits a free-tier limit, descriptions automatically
+retry with `AI_FALLBACK_MODEL` (default `nemotron-3-super`).
 
-Load a **catalogue PDF** + the **VVIP master sheet**, then work through three tabs.
+Load a **catalogue PDF** and the **VVIP master sheet**, then work through three tabs.
 
 ## The three features
 
-1. **Cross-check** — for every merchant, is it *in the catalogue* and is it *still a
-   VVIP* (in the sheet)?
-   - in + VVIP → **keep**
-   - in + not VVIP → **remove** (dropped from VVIP)
-   - VVIP + not in → **add** (missing VVIP)
-   - Handle matching is fuzzy (the sheet stores business names that get derived to
-     stems like `revology`; the catalogue shows `revologybikes` — a prefix match
-     bridges them).
+1. **Cross-check.** For every merchant, is it in the catalogue and is it still a
+   VVIP (in the sheet)?
+   - in catalogue and VVIP: **keep**
+   - in catalogue but not VVIP: **remove** (dropped from VVIP)
+   - VVIP but not in catalogue: **add** (missing VVIP)
+   - Handle matching is fuzzy. The sheet often stores a business name that derives
+     to a short stem such as `acmebrand`, while the catalogue shows the fuller
+     handle `acmebrandsg`. A prefix match bridges the two. (Handles shown here are
+     placeholders, not real merchants.)
 
-2. **QR check** — decode every QR and prove it is trustworthy:
-   - decodes to the **printed handle** (else *mismatch*)
-   - resolves to a **live profile** (else *dead*)
-   - lands on the **right merchant**, not a renamed account (*renamed*) or a blank
-     shell that loads but isn't the profile (*soft-404*)
-   - missing QR → *no-qr*
+2. **QR check.** Decode every QR and prove it is trustworthy:
+   - decodes to the printed handle (otherwise *mismatch*)
+   - resolves to a live profile (otherwise *dead*)
+   - lands on the right merchant, not a renamed account (*renamed*) or a blank
+     shell that loads but is not the profile (*soft-404*)
+   - missing QR is flagged *no-qr*
 
-3. **Generate** — apply the **approved** changes and render the corrected next
-   edition: `final = in-catalogue VVIPs − approved removals + approved additions`.
+3. **Generate.** Apply the approved changes and render the corrected next edition,
+   where `final = in-catalogue VVIPs - approved removals + approved additions`.
    Every card is rebuilt fresh (profile, description, and a brand-new QR from the
    canonical URL), so every broken QR is fixed by construction. Dead profiles are
    skipped and reported.
 
-Changes from Features 1 & 2 are **proposed**, you **approve** them (checkboxes), and
-only then does Generate **apply** them.
+Changes from features 1 and 2 are proposed. You approve them with checkboxes, and
+only then does Generate apply them.
 
 ## Architecture
 
 ```
-app.py                 Streamlit UI — 3 tabs, session-state driven
+app.py                 Streamlit UI, 3 tabs, session-state driven
 studio/
   sources.py           single wiring point to the two engine packages (lazy
                        imports for the heavy native/browser entry points)
   state.py             StudioSession, MerchantRecord, ProposedChange
-  crosscheck.py        Feature 1  (extract + master diff)            — in-process
-  qr.py                Feature 2  (decode-match + live + soft-404)   — threaded
-  generate.py          Feature 3  (apply approved changes + render)  — threaded
+  crosscheck.py        Feature 1 (extract + master diff), in-process
+  qr.py                Feature 2 (decode-match + live + soft-404), threaded
+  generate.py          Feature 3 (apply approved changes + render), threaded
   runner.py            run a Playwright stage on a background thread
 ```
 
 Engines reused as-is (vendored at the repo root, not external packages):
-- **qrcheck/** — PDF extraction, master ingest, live verify
-- **catbuilder/** — profile fetch, describe, QR gen, PDF render
+- **qrcheck/** for PDF extraction, master ingest, and live verify
+- **catbuilder/** for profile fetch, describe, QR gen, and PDF render
 
-## Testing & quality
+## Testing and quality
 
-Run the test suite (50 network-free unit tests over the critical paths — SSRF
-guard, handle/URL normalization, QR verdict logic, master ingest, cross-check,
+Run the test suite (network-free unit tests over the critical paths: SSRF guard,
+handle and URL normalization, QR verdict logic, master ingest, cross-check,
 descriptions, and the `.env` loader):
 
 ```bash
@@ -105,29 +110,29 @@ pytest
 ```
 
 CI runs the same suite on every push and pull request to `main`
-(`.github/workflows/ci.yml`) — a red suite blocks the change. The project keeps a
-lightweight ISO 9001-aligned quality system under `docs/`:
+(`.github/workflows/ci.yml`), and a red suite blocks the change. The project keeps
+a lightweight ISO 9001-aligned quality system under `docs/`:
 
-- [docs/QUALITY.md](docs/QUALITY.md) — quality policy, measurable objectives, release process
-- [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) — requirements + acceptance criteria, traced to tests
-- [docs/NONCONFORMITY_LOG.md](docs/NONCONFORMITY_LOG.md) — defect / corrective-action log
+- [docs/QUALITY.md](docs/QUALITY.md) for the quality policy, measurable objectives, and release process
+- [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) for requirements and acceptance criteria, traced to tests
+- [docs/NONCONFORMITY_LOG.md](docs/NONCONFORMITY_LOG.md) for the defect and corrective-action log
 
-The Playwright-backed stages (live QR check, profile fetch) run on a **background
-thread** inside the Streamlit process — sync Playwright can't `start()` on a thread
+The Playwright-backed stages (live QR check, profile fetch) run on a background
+thread inside the Streamlit process. Sync Playwright cannot `start()` on a thread
 that already has a running asyncio loop, so a fresh thread sidesteps it. No
 subprocess required.
 
-## Notes / environment
+## Notes and environment
 
-- **AI descriptions** need a compatible provider configured via
-  `AI_BASE_URL` / `AI_API_KEY` / `AI_MODEL` (see the free options above); without
-  it, cards get a generic description (toggle is disabled).
-- **macOS sandbox**: if launched in a restricted sandbox, files under `~/Downloads`
+- **AI descriptions** need an AI provider configured with `AI_BASE_URL`,
+  `AI_API_KEY`, and `AI_MODEL` (see the options above). Without one, cards get a
+  generic description and the toggle is disabled.
+- **macOS sandbox:** if launched in a restricted sandbox, files under `~/Downloads`
   and `~/Library/CloudStorage` may be unreadable. The app prefers
-  `/tmp/qrcheck_master.xlsx` and `/tmp/qrcheck_archive/*.pdf`; stage copies there if
-  needed.
-- The master sheet stores business *names*, so the **add** list can contain noisy
-  derived handles — review and uncheck junk before generating (dead ones are skipped
+  `/tmp/qrcheck_master.xlsx` and `/tmp/qrcheck_archive/*.pdf`, so stage copies there
+  if needed.
+- The master sheet stores business names, so the **add** list can contain noisy
+  derived handles. Review and uncheck junk before generating (dead ones are skipped
   anyway).
-- Profile/avatar/QR assets are cached under `/tmp/catbuilder_cache` (shared with
-  catbuilder).
+- Profile, avatar, and QR assets are cached under `/tmp/catbuilder_cache` (shared
+  with catbuilder).

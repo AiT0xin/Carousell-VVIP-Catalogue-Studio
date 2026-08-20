@@ -7,14 +7,14 @@ from studio.state import StudioSession, MerchantRecord, CC_KEEP, CC_REMOVE, CC_A
 
 
 def test_exact_match():
-    ok, matched = _match_vvip("motordez", {"motordez"})
-    assert ok and matched == "motordez"
+    ok, matched = _match_vvip("acmemotors", {"acmemotors"})
+    assert ok and matched == "acmemotors"
 
 
 def test_prefix_fuzzy_match():
-    # master stores the stem "revology"; catalogue shows "revologybikes"
-    ok, matched = _match_vvip("revologybikes", {"revology"})
-    assert ok and matched == "revology"
+    # master stores the stem "acmebrand"; catalogue shows "acmebrandsg"
+    ok, matched = _match_vvip("acmebrandsg", {"acmebrand"})
+    assert ok and matched == "acmebrand"
 
 
 def test_no_fuzzy_for_short_handles():

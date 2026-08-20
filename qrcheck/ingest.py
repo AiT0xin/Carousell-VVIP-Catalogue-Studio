@@ -118,10 +118,10 @@ def _harvest_handles(cell: object) -> list[str]:
     """Pull handle-shaped tokens out of a cell.
 
     Handles three shapes:
-      1. A clean handle or profile URL (no spaces): "awesometints", "motorydez"
-      2. Slash-separated multi-handle: "isellcarshades /Thecarstuffs.com"
-      3. A business name: "JSS MOTORWORKZ PTE LTD" → strip corporate suffixes
-         and descriptors, yielding "jssmotorworkz"
+      1. A clean handle or profile URL (no spaces): "acmetints", "acmemotors"
+      2. Slash-separated multi-handle: "acmecarshades /Acmecarparts.com"
+      3. A business name: "ACME MOTORWORKS PTE LTD" → strip corporate suffixes
+         and descriptors, yielding "acmemotorworks"
     """
     if cell is None or (isinstance(cell, float) and pd.isna(cell)):
         return []

@@ -17,7 +17,7 @@ in the same change.
 |----|-------------|---------------------|-------------|
 | FR-1.1 | Identify every merchant present in the catalogue PDF | Each card's printed handle is extracted; CTA-only cards carry no handle | manual / integration (`extract_pdf`) |
 | FR-1.2 | Classify each merchant KEEP / REMOVE / ADD | in+vvip → KEEP; in+¬vvip → REMOVE; ¬in+vvip → ADD | `tests/test_crosscheck.py::test_summary_counts` |
-| FR-1.3 | Bridge business-name stems to full handles | Prefix match ≥ 5 chars unifies e.g. `revology` ↔ `revologybikes` | `tests/test_crosscheck.py::test_prefix_fuzzy_match` |
+| FR-1.3 | Bridge business-name stems to full handles | Prefix match ≥ 5 chars unifies e.g. `acmebrand` ↔ `acmebrandsg` | `tests/test_crosscheck.py::test_prefix_fuzzy_match` |
 
 ### FR-2 QR check
 

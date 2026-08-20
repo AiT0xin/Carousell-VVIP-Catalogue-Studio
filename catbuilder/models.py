@@ -9,15 +9,15 @@ from typing import Optional
 @dataclass
 class MerchantData:
     """All data needed to render one merchant card."""
-    handle: str                          # e.g. "motordez" (no @)
-    display_name: str = ""               # e.g. "Motordez"
+    handle: str                          # e.g. "acmemotors" (no @)
+    display_name: str = ""               # e.g. "Acme Motors"
     category: str = ""                   # e.g. "Car Parts & Accessories"
     bio: str = ""                        # raw Carousell bio (may be empty)
     description: str = ""               # generated 40-50 word description
     avatar_path: Optional[Path] = None           # local path to downloaded avatar PNG
     qr_path: Optional[Path] = None              # local path to generated QR PNG
     listing_image_paths: list[Path] = None      # up to 4 listing thumbnails  # type: ignore[assignment]
-    profile_url: str = ""                        # e.g. "https://www.carousell.sg/u/motordez/"
+    profile_url: str = ""                        # e.g. "https://www.carousell.sg/u/acmemotors/"
 
     def __post_init__(self) -> None:
         if self.listing_image_paths is None:
