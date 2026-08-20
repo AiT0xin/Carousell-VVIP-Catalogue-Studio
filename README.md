@@ -2,6 +2,8 @@
 
 One app, three features, for maintaining Carousell VVIP merchant e-catalogues.
 
+![VVIP Catalogue Studio](docs/preview.png)
+
 ## Setup
 
 Requires Python 3.10+.
