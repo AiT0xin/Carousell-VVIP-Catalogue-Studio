@@ -56,7 +56,7 @@ class CatalogueJob:
     output_path: Path = Path("catalogue.pdf")
     cache_dir: Path = Path("/tmp/catbuilder_cache")
     # Optional user-supplied cover art (full-page image). When None, no cover
-    # page is rendered — there is no auto-generated branded cover.
+    # page is rendered - there is no auto-generated branded cover.
     cover_path: Optional[Path] = None
     back_cover_path: Optional[Path] = None
 

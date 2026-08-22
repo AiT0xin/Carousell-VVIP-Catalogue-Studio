@@ -1,4 +1,4 @@
-"""Master-sheet ingest — the forgiving parser that harvests Carousell handles
+"""Master-sheet ingest - the forgiving parser that harvests Carousell handles
 out of a messy, mixed-content VVIP sheet (business names, slash-separated cells,
 corporate suffixes). A CSV fixture stands in for the multi-sheet xlsx."""
 from qrcheck.ingest import (

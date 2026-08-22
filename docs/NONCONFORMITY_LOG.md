@@ -3,7 +3,7 @@
 Record of defects and audit findings, their root cause, and the corrective
 action taken (ISO 9001 clause 10.2). The aim is to fix causes, not just
 symptoms, and to see patterns over time. Add a row whenever a nonconformity is
-found — from the ISO self-audit, a bug report, or a failed CI run.
+found - from the ISO self-audit, a bug report, or a failed CI run.
 
 Status: **Open** · **Fixed** · **Monitoring**
 
@@ -23,7 +23,7 @@ Status: **Open** · **Fixed** · **Monitoring**
 
 ## Ongoing defect log
 
-New defects go here. Example row kept as a template — replace with real entries.
+New defects go here. Example row kept as a template - replace with real entries.
 
 | ID | Date | Clause | Defect | Root cause | Corrective action | Status |
 |----|------|--------|--------|------------|-------------------|--------|

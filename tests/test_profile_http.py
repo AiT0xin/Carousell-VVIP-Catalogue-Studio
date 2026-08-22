@@ -1,4 +1,4 @@
-"""Listing-title extraction from the static Carousell profile HTML — this is what
+"""Listing-title extraction from the static Carousell profile HTML - this is what
 gives the description generator real product context instead of just the bio."""
 from studio.profile_http import _extract_listing_titles
 

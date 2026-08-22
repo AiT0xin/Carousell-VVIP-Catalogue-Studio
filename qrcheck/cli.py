@@ -101,7 +101,7 @@ def run(pdf_path: str, out_path: str, master_path: str | None = None,
         report_rows.append(ReportRow(
             page=h.page, printed_handle=h.raw, qr_status="no-qr",
             match_status="printed handle, no QR found",
-            in_master=("Yes" if h.text in master.handles else ("No" if master.handles else "—")),
+            in_master=("Yes" if h.text in master.handles else ("No" if master.handles else "-")),
             reason_code=ReasonCode.UNPAIRED_HANDLE,
             detail="a handle is printed but no QR was paired to it",
         ))
@@ -130,13 +130,13 @@ def _offline_row(r: ExtractedRow, master_handles) -> ReportRow:
     if r.qr_class is QRClass.CTA:
         rr.reason_code = ReasonCode.CTA_OK
         rr.match_status = "n/a (CTA)"
-        rr.in_master = "—"
+        rr.in_master = "-"
         return rr
     dh = r.decoded_handle or ""
     rr.resolves_to = ("@" + dh) if dh else (r.decoded_url or "")
     rr.qr_status = "decoded (not verified)"
     if r.qr_class is QRClass.SHORTLINK:
-        rr.match_status = "shortlink — resolve to compare"
+        rr.match_status = "shortlink - resolve to compare"
         rr.reason_code = ReasonCode.PASS
     elif printed and dh:
         if printed == dh:
@@ -146,7 +146,7 @@ def _offline_row(r: ExtractedRow, master_handles) -> ReportRow:
             rr.match_status = f"printed @{printed} != QR @{dh}"
             rr.reason_code = ReasonCode.MISMATCH
     rr.in_master = ("Yes" if (dh or printed) in master_handles
-                    else ("No" if master_handles else "—"))
+                    else ("No" if master_handles else "-"))
     return rr
 
 

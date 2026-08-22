@@ -14,7 +14,7 @@ reportlab>=4.1.0
 qrcode[pil]>=7.4.2
 Pillow>=10.0.0
 openpyxl>=3.1.0
-# AI descriptions — OpenAI-compatible client works with Ollama Cloud (free),
+# AI descriptions - OpenAI-compatible client works with Ollama Cloud (free),
 # local Ollama, Gemini, or any OpenAI-compatible endpoint (configure via
 # AI_BASE_URL / AI_API_KEY / AI_MODEL env vars; see catbuilder/describer.py).
 openai>=1.0.0

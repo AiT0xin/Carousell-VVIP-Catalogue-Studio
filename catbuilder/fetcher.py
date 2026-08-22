@@ -51,7 +51,7 @@ def _extract_profile(page: Page) -> dict:
     """Extract profile fields from a loaded Carousell profile page."""
     data: dict = {}
 
-    # Display name — look for h1 or og:title
+    # Display name - look for h1 or og:title
     try:
         h1 = page.query_selector("h1")
         if h1:
@@ -64,7 +64,7 @@ def _extract_profile(page: Page) -> dict:
             meta = page.query_selector("meta[property='og:title']")
             if meta:
                 og_title = meta.get_attribute("content") or ""
-                # og:title is usually "Handle (@handle) on Carousell" — strip suffix
+                # og:title is usually "Handle (@handle) on Carousell" - strip suffix
                 og_title = re.sub(r"\s*\(@[^)]+\)\s*on Carousell.*$", "", og_title).strip()
                 if og_title:
                     data["display_name"] = og_title
@@ -101,7 +101,7 @@ def _extract_profile(page: Page) -> dict:
         pass
     data["seller_tier"] = tier
 
-    # Listing titles + thumbnail image URLs — scraped while page is open
+    # Listing titles + thumbnail image URLs - scraped while page is open
     listing_titles: list[str] = []
     listing_image_urls: list[str] = []
     try:
@@ -138,7 +138,7 @@ def _extract_profile(page: Page) -> dict:
     data["listing_titles"] = listing_titles
     data["listing_image_urls"] = listing_image_urls[:4]
 
-    # Avatar URL — try og:image first, then profile image elements
+    # Avatar URL - try og:image first, then profile image elements
     avatar_url = ""
     try:
         meta = page.query_selector("meta[property='og:image']")
@@ -287,7 +287,7 @@ def fetch_and_cache(
     """Fetch profile + download avatar for a MerchantData, mutating it in place."""
     data = fetch_profile(merchant.handle, cache_dir, throttle)
     if data is None:
-        print(f"  @{merchant.handle} — profile not found, skipping")
+        print(f"  @{merchant.handle} - profile not found, skipping")
         return merchant
 
     merchant.display_name = data.get("display_name") or merchant.handle.title()

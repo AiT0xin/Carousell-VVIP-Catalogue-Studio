@@ -2,7 +2,7 @@
 
 Liveness contract (from the spec's hard-won lesson): HTTP 200 is NOT a pass. We
 render the page with a real browser (JS executed) and assert the destination is
-a *live merchant profile* — not a blank shell, not a "user doesn't exist" page.
+a *live merchant profile* - not a blank shell, not a "user doesn't exist" page.
 
 Signals used (resilient-first, tuned against live DOM):
   * URL/canonical/og:url  -> the destination username (ground truth for matching)
@@ -73,7 +73,7 @@ class CarousellVerifier(Verifier):
     def _verify_uncached(self, url: str) -> VerifyResult:
         # Step 1: cheap redirect resolution (reveals shortlink destination,
         # hard dead links). Some hosts block HEAD/GET bots, so a failure here is
-        # not conclusive — we still try a render.
+        # not conclusive - we still try a render.
         resolved = self.resolve(url)
         final_url = resolved.final_url or url
 
@@ -128,7 +128,7 @@ class CarousellVerifier(Verifier):
             title = (page.title() or "").strip()
             body_text = (page.inner_text("body") if page.query_selector("body") else "") or ""
 
-            # Ground-truth username comes from canonical/og:url — present only on
+            # Ground-truth username comes from canonical/og:url - present only on
             # a real profile page; absent on the 404.
             canonical_handle = self._username_from_meta(page)
             res.resolves_to_handle = canonical_handle or handle_from_profile_url(landed)
@@ -137,7 +137,7 @@ class CarousellVerifier(Verifier):
                       or title.lower() == _GENERIC_TITLE
                       or _bounced_home(landed))
 
-            # DEAD: 404 page / orphaned slug — no canonical, generic title.
+            # DEAD: 404 page / orphaned slug - no canonical, generic title.
             if is_404 and canonical_handle is None:
                 res.is_live_profile = False
                 res.qr_status = "dead"
@@ -168,7 +168,7 @@ class CarousellVerifier(Verifier):
                 res.detail = ", ".join(bits) or "profile rendered"
             else:
                 # Canonical present but no listings/reviews/tier: empty placeholder
-                # — the renamed-and-orphaned shell the spec warns about.
+                # - the renamed-and-orphaned shell the spec warns about.
                 res.is_live_profile = False
                 res.qr_status = "blank-shell"
                 res.detail = "profile shell, 0 listings/reviews, not verified"

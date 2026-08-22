@@ -1,4 +1,4 @@
-"""Stage 1 — ingest & normalize the master document into a tidy handle table.
+"""Stage 1 - ingest & normalize the master document into a tidy handle table.
 
 Designed for the real VVIP master, which is multi-sheet (Goods / Services /
 Luxury / Autos), has a 3-row banner before the data, and is mixed-content (some
@@ -105,7 +105,7 @@ def _biz_name_to_handle(text: str) -> str | None:
     s = _BIZ_SUFFIX_RE.sub("", text).strip()
     s = _PARENS_RE.sub("", s).strip()
     s = _DESCRIPTOR_RE.sub(" ", s).strip()
-    # Collapse remaining whitespace — if none left, the name was all descriptor.
+    # Collapse remaining whitespace - if none left, the name was all descriptor.
     s = re.sub(r"\s+", "", s).lower()
     if not s or len(s) < 3:
         return None

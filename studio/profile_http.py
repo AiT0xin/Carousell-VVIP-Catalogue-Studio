@@ -1,4 +1,4 @@
-"""Pure-httpx Carousell profile fetcher — no browser, no fork, sandbox-safe.
+"""Pure-httpx Carousell profile fetcher - no browser, no fork, sandbox-safe.
 
 Carousell server-renders the profile's `<head>` (og:title, og:image, the
 description meta) even though the listing grid is client-side. That head is
@@ -67,7 +67,7 @@ def _clean_name(og_title: str, handle: str) -> str:
 
 
 # Carousell server-renders its listing cards into the page as escaped JSON, so we
-# can harvest listing *titles* without a browser — enough to tell the describer
+# can harvest listing *titles* without a browser - enough to tell the describer
 # what the merchant actually sells. This reads an undocumented internal shape, so
 # it is strictly best-effort: any failure just yields an empty list.
 _TITLE_RE = re.compile(r'"title"\s*:\s*"((?:[^"\\]|\\.){4,120})"')
@@ -126,7 +126,7 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
         return None
 
     full = resp.text or ""
-    html = full[:500_000]  # head meta (og:*, description) is early — cap is fine here
+    html = full[:500_000]  # head meta (og:*, description) is early - cap is fine here
     og_title = _meta(html, "og:title")
     if not og_title:
         # No server-rendered profile head → treat as dead/unresolvable.
@@ -143,7 +143,7 @@ def fetch_profile_http(handle: str, cache_dir: Path, throttle: float = 1.0) -> O
         "avatar_url": _meta(html, "og:image"),
         "seller_tier": tier_m.group(1) if tier_m else "",
         # Listing cards render later in the body (often past 500 KB), so scan a
-        # larger slice — the regex is linear and output is capped at 6.
+        # larger slice - the regex is linear and output is capped at 6.
         "listing_titles": _extract_listing_titles(full[:2_000_000]),
         "listing_image_urls": [],
     }

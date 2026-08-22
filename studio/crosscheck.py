@@ -1,4 +1,4 @@
-"""Feature 1 — VVIP cross-check.
+"""Feature 1 - VVIP cross-check.
 
 For every merchant, answer two yes/no questions:
   • Are they in the catalogue?  (a card exists for their handle)
@@ -6,8 +6,8 @@ For every merchant, answer two yes/no questions:
 
 and turn the answer into an action:
   in + vvip   → KEEP    (feature them, no change)
-  in + !vvip  → REMOVE  (dropped from VVIP — pull from next edition)
-  !in + vvip  → ADD     (missing VVIP — add to next edition)
+  in + !vvip  → REMOVE  (dropped from VVIP - pull from next edition)
+  !in + vvip  → ADD     (missing VVIP - add to next edition)
 
 Removals and additions are emitted as ProposedChange rows for the user to
 approve before Feature 3 applies them.
@@ -62,7 +62,7 @@ def _catalogue_handles(rows, unpaired) -> dict[str, dict]:
             entry["decoded_url"] = r.decoded_url
             entry["decoded_handle"] = r.decoded_handle or ""
 
-    # Printed handles with no QR at all — still in the catalogue.
+    # Printed handles with no QR at all - still in the catalogue.
     for h in unpaired:
         found.setdefault(h.text, {"page": h.page, "decoded_url": "",
                                   "decoded_handle": ""})
@@ -111,7 +111,7 @@ def run_crosscheck(session: StudioSession) -> StudioSession:
         )
         merchants.append(rec)
 
-    # 4. Missing VVIPs — in the sheet, no card in the catalogue
+    # 4. Missing VVIPs - in the sheet, no card in the catalogue
     for mh in sorted(master_handles - matched_master):
         merchants.append(MerchantRecord(
             handle=mh,

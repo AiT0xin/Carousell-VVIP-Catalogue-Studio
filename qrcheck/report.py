@@ -1,4 +1,4 @@
-"""Stage 4 — emit the XLSX report.
+"""Stage 4 - emit the XLSX report.
 
 One row per QR/merchant plus coverage rows. Flagged rows are highlighted and a
 reason_code column carries the machine-readable outcome. A summary sheet gives

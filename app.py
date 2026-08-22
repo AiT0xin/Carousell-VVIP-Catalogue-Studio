@@ -202,7 +202,7 @@ html, body, .stApp, * {
   color: #fff !important;
 }
 
-/* Marquee banner — must beat .stApp span:not(.carousell-logo) at 0-2-1 */
+/* Marquee banner - must beat .stApp span:not(.carousell-logo) at 0-2-1 */
 .stApp .marquee-track span,
 .stApp .marquee-track span em,
 .stApp .marquee-wrap .marquee-track span {
@@ -788,7 +788,7 @@ textarea:focus {
   background: transparent !important;
   background-color: transparent !important;
 }
-/* Header band must not paint white over the red — let red show at the top */
+/* Header band must not paint white over the red - let red show at the top */
 [data-testid="stHeader"],
 [data-testid="stToolbar"] {
   background: transparent !important;
@@ -1249,7 +1249,7 @@ sess: StudioSession = st.session_state.sess
 @st.dialog("Terms of Use")
 def _show_tos():
     st.markdown("""
-**VVIP E-Catalogue Studio — Terms of Use**
+**VVIP E-Catalogue Studio - Terms of Use**
 *Last updated: 18 August 2026*
 
 By accessing, installing, running, or otherwise using this Software, you acknowledge that you have read, understood, and agree to be bound by these Terms of Use ("Terms") in their entirety. If you do not agree, do not use the Software.
@@ -1270,7 +1270,7 @@ You are solely responsible for any files, spreadsheets, images, PDFs, URLs, cred
 
 **4. Third-Party Services and Platforms**
 
-The Software may, at your direction, interact with third-party services and platforms (including but not limited to Carousell websites and third-party AI providers, such as any OpenAI-compatible endpoint, Ollama, or Google Gemini, that you choose to configure). Your use of any such third-party service is governed solely by that service's own terms of service, acceptable-use policies, and applicable laws. You are solely responsible for ensuring that your use of the Software — including any automated access, retrieval, verification, or processing of publicly available information — complies with those terms and with all applicable laws and regulations. The Developer does not endorse, control, or assume any responsibility for any third-party service, its availability, or the consequences of your use of it.
+The Software may, at your direction, interact with third-party services and platforms (including but not limited to Carousell websites and third-party AI providers, such as any OpenAI-compatible endpoint, Ollama, or Google Gemini, that you choose to configure). Your use of any such third-party service is governed solely by that service's own terms of service, acceptable-use policies, and applicable laws. You are solely responsible for ensuring that your use of the Software - including any automated access, retrieval, verification, or processing of publicly available information - complies with those terms and with all applicable laws and regulations. The Developer does not endorse, control, or assume any responsibility for any third-party service, its availability, or the consequences of your use of it.
 
 **5. Acceptable Use and Assumption of Risk**
 
@@ -1278,7 +1278,7 @@ You agree to use the Software only for lawful purposes and in accordance with th
 
 **6. Restriction on Copying**
 
-The Software, including its source code, logic, structure, design, and presentation, is the intellectual property of Owin Tan. Carousell Group, and any other person or entity, is expressly prohibited from copying, reproducing, adapting, translating, reverse-engineering, decompiling, redistributing, sublicensing, or incorporating any part of the Software — in whole or in part — into any commercial, internal, or derivative product without the prior written consent of Owin Tan. No rights are granted except as expressly set out in these Terms.
+The Software, including its source code, logic, structure, design, and presentation, is the intellectual property of Owin Tan. Carousell Group, and any other person or entity, is expressly prohibited from copying, reproducing, adapting, translating, reverse-engineering, decompiling, redistributing, sublicensing, or incorporating any part of the Software - in whole or in part - into any commercial, internal, or derivative product without the prior written consent of Owin Tan. No rights are granted except as expressly set out in these Terms.
 
 **7. Permitted Use**
 
@@ -1441,7 +1441,7 @@ section[data-testid="stSidebar"] [data-testid="stSelectbox"] span {
     st.markdown('<p style="font-size:11px;font-weight:700;letter-spacing:0.32px;text-transform:uppercase;color:#ffffff !important;margin-bottom:12px;">STEP 1  CATALOGUE PDF</p>', unsafe_allow_html=True)
 
     uploaded = st.file_uploader("Catalogue PDF", type=["pdf"], label_visibility="collapsed")
-    # Only (re)process when a genuinely new file is uploaded — file_id is stable
+    # Only (re)process when a genuinely new file is uploaded - file_id is stable
     # across reruns, so this won't re-create tempfiles or wipe results each run.
     if uploaded is not None:
         if st.session_state.get("_cat_file_id") != uploaded.file_id:
@@ -1674,7 +1674,7 @@ if not ready:
     """, unsafe_allow_html=True)
 
     # Category tiles use the locally-embedded images (studio/static/*.b64) so the
-    # page is fully self-contained — no external hotlinks that can break, go
+    # page is fully self-contained - no external hotlinks that can break, go
     # stale, or leak each visitor's IP to third-party image hosts.
     st.markdown(f"""
 <div class="cat-grid">
@@ -1880,7 +1880,7 @@ with tab1:
         s = crosscheck_summary(sess)
         st.markdown("""
 <style>
-/* Cross-check metric cards — uniform height + tinted fill, no white inner box */
+/* Cross-check metric cards - uniform height + tinted fill, no white inner box */
 [data-testid="stHorizontalBlock"] > div [data-testid="stMetric"] {
   min-height: 150px !important;
   display: flex !important;
@@ -1899,13 +1899,13 @@ with tab1:
   background: transparent !important;
   background-color: transparent !important;
 }
-/* Cards 1 & 2 — neutral */
+/* Cards 1 & 2 - neutral */
 [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stMetric"],
 [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetric"] {
   background-color: #f7f7f8 !important;
   border: 1px solid #e5e7eb !important;
 }
-/* Card 3 — Keep (green) */
+/* Card 3 - Keep (green) */
 [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetric"] {
   background-color: #dcfce7 !important;
   border: 1px solid #86efac !important;
@@ -1913,7 +1913,7 @@ with tab1:
 [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetricLabel"] * {
   color: #059669 !important;
 }
-/* Card 4 — Remove (red) */
+/* Card 4 - Remove (red) */
 [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stMetric"] {
   background-color: #ffe4e6 !important;
   border: 1px solid #fecdd3 !important;
@@ -1921,7 +1921,7 @@ with tab1:
 [data-testid="stHorizontalBlock"] > div:nth-child(4) [data-testid="stMetricLabel"] * {
   color: #8b0a1a !important;
 }
-/* Card 5 — Add (blue) */
+/* Card 5 - Add (blue) */
 [data-testid="stHorizontalBlock"] > div:nth-child(5) [data-testid="stMetric"] {
   background-color: #dbeafe !important;
   border: 1px solid #bfdbfe !important;
@@ -1935,12 +1935,12 @@ with tab1:
         m[0].metric("In catalogue", s["in_catalogue"])
         m[1].metric("VVIPs in sheet", s["vvip_total"])
         m[2].metric("✓ Keep", s["keep"])
-        m[3].metric("— Remove", s["remove"], delta=f"-{s['remove']}",
+        m[3].metric("- Remove", s["remove"], delta=f"-{s['remove']}",
                     delta_color="normal")
         m[4].metric("+ Add", s["add"], delta=f"+{s['add']}",
                     delta_color="normal")
 
-        _BADGE = {CC_KEEP: "✓ keep", CC_REMOVE: "— remove", CC_ADD: "+ add"}
+        _BADGE = {CC_KEEP: "✓ keep", CC_REMOVE: "- remove", CC_ADD: "+ add"}
         rows = [{
             "Handle": x.handle,
             "Merchant": x.display_name or "-",
@@ -2053,10 +2053,10 @@ with tab2:
             m[2].metric("» Renamed", counts.get(QR_RENAMED, 0))
             m[3].metric("× Dead", counts.get(QR_DEAD, 0))
             m[4].metric("? Soft 404", counts.get(QR_SOFT404, 0))
-            m[5].metric("— No QR", counts.get(QR_NONE, 0))
+            m[5].metric("- No QR", counts.get(QR_NONE, 0))
 
             _QB = {QR_OK: "✓ ok", QR_MISMATCH: "~ mismatch", QR_RENAMED: "» renamed",
-                   QR_DEAD: "× dead", QR_SOFT404: "? soft 404", QR_NONE: "— no qr",
+                   QR_DEAD: "× dead", QR_SOFT404: "? soft 404", QR_NONE: "- no qr",
                    QR_UNKNOWN: "·"}
             rows = [{
                 "Handle": x.handle,
@@ -2104,7 +2104,7 @@ with tab3:
         if not have_key:
             st.caption("No API key found - cards will use a generic description.")
 
-        st.markdown("**Cover pages** — optional. Upload a front and/or back "
+        st.markdown("**Cover pages** - optional. Upload a front and/or back "
                     "cover (PDF or image) to wrap the catalogue. Leave empty for "
                     "no cover.")
         _cov_c1, _cov_c2 = st.columns(2)
@@ -2154,10 +2154,10 @@ with tab3:
                 _out = (_out / f"{_stem}_corrected.pdf") if _out.is_dir() \
                     else _out.with_suffix(".pdf")
             # Validate: must live within /tmp or the home dir. Resolve the allowed
-            # roots too — on macOS /tmp is a symlink to /private/tmp, so a resolved
+            # roots too - on macOS /tmp is a symlink to /private/tmp, so a resolved
             # output path won't match the literal "/tmp". Use real path containment
-            # (== root or root in parents), not a string prefix — a prefix check
-            # would wrongly accept siblings like /tmp-evil or /Users/owinX.
+            # (== root or root in parents), not a string prefix - a prefix check
+            # would wrongly accept siblings like /tmp-evil or /home/userX.
             _allowed = (Path("/tmp").resolve(), Path.home().resolve())
             if not any(_out == p or p in _out.parents for p in _allowed):
                 st.error("Output path must be within /tmp or your home directory.")
@@ -2211,7 +2211,7 @@ with tab3:
                 sess.generate_done = True
                 st.rerun()
 
-        # Persistent result panel — survives the rerun above so the download
+        # Persistent result panel - survives the rerun above so the download
         # button and preview stay visible after generation completes.
         if sess.generate_done and sess.generate_result:
             _gr = sess.generate_result

@@ -4,14 +4,14 @@ This is the ONLY place that knows where the engine code lives. Everything else
 imports the re-exported names from here, so if the engines move we change one
 file.
 
-  - qrcheck     (vendored at repo root)  — extraction, master ingest, live verify
-  - catbuilder  (vendored at repo root)  — profile fetch, describe, QR gen, render
+  - qrcheck     (vendored at repo root)  - extraction, master ingest, live verify
+  - catbuilder  (vendored at repo root)  - profile fetch, describe, QR gen, render
 
 Heavy / native-backed entry points (QR decode → cv2+pyzbar, live verify + profile
 fetch → Playwright) are **lazy**: the underlying module is imported the first time
 the wrapper is *called*, not at import time. That keeps a worker stage from
-loading libraries it doesn't use — e.g. an offline QR check pulls in neither
-OpenCV nor Playwright — which also avoids segfaulting native libs in a freshly
+loading libraries it doesn't use - e.g. an offline QR check pulls in neither
+OpenCV nor Playwright - which also avoids segfaulting native libs in a freshly
 spawned subprocess.
 
 Importing the `qrcheck` package first installs its zbar shared-library shim

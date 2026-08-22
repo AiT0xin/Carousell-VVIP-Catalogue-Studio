@@ -1,7 +1,7 @@
 """Run a Playwright-backed stage in-process without tripping Streamlit.
 
 Sync Playwright can't `start()` on a thread that already has a running asyncio
-event loop — which Streamlit's script thread does. The fix is to run the stage
+event loop - which Streamlit's script thread does. The fix is to run the stage
 on a *fresh* background thread (no loop of its own) and stream progress back to
 the Streamlit thread through a queue. The background thread only touches plain
 Python objects (the session + the queue), never `st.*`, so it needs no

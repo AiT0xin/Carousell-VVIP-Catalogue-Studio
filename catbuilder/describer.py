@@ -6,13 +6,13 @@ For each merchant:
      for the business by name to gather richer context.
   3. Pass everything to an LLM to write a punchy 40-50 word VVIP description.
 
-Works with ANY OpenAI-compatible endpoint — pick whichever is cheapest/free:
+Works with ANY OpenAI-compatible endpoint - pick whichever is cheapest/free:
 
   • Ollama Cloud (free tier):
         AI_BASE_URL=https://ollama.com/v1
         AI_API_KEY=<your ollama key>          (from ollama.com settings)
         AI_MODEL=gpt-oss:120b
-  • Local Ollama (free, offline — `ollama serve`):
+  • Local Ollama (free, offline - `ollama serve`):
         AI_BASE_URL=http://localhost:11434/v1
         AI_MODEL=llama3.2                       (no key needed)
   • Google Gemini (free tier):
@@ -54,7 +54,7 @@ _CLIENT = None
 
 
 def ai_configured() -> bool:
-    """True only when the user has explicitly configured an AI provider — a
+    """True only when the user has explicitly configured an AI provider - a
     cloud key (AI_API_KEY), or an explicit local base URL they opted into. With
     nothing set, descriptions stay off and cards use the generic fallback."""
     if os.environ.get("AI_API_KEY"):
@@ -80,7 +80,7 @@ You write concise, punchy 40-50 word business descriptions for merchants on the 
 Carousell VVIP e-catalogue. The tone is confident and professional but approachable. \
 Always mention what the business sells or does, and end with something that makes \
 the reader want to visit the profile. Never use phrases like "Look no further", \
-"One-stop shop", or "your go-to". Output ONLY the description text — no quotes, \
+"One-stop shop", or "your go-to". Output ONLY the description text - no quotes, \
 no prefix, no trailing newline."""
 
 
@@ -105,7 +105,7 @@ _GROUNDING_STOPWORDS = {
 
 
 def _grounding_tokens(merchant, bio: str, listing_titles: list[str]) -> set[str]:
-    """Distinctive words a genuine description of THIS merchant should echo — its
+    """Distinctive words a genuine description of THIS merchant should echo - its
     name, handle, category, and content words from its bio / listings."""
     tokens: set[str] = set()
     strong = " ".join([merchant.display_name or "", merchant.handle or "",
@@ -209,7 +209,7 @@ def _build_prompt(
         lines.append(f"\nAdditional context from the web:\n{web_context[:800]}")
     lines.append(
         "\nWrite a 40-50 word Carousell VVIP catalogue description for this merchant. "
-        "Draw on all the context above — what they actually sell, their speciality, "
+        "Draw on all the context above - what they actually sell, their speciality, "
         "and anything that makes them stand out. Be specific; avoid generic phrases."
     )
     return "\n".join(lines)
@@ -304,9 +304,9 @@ def generate_description(
                 continue
             description = candidate_text
             break
-        except Exception as e:  # noqa: BLE001 — try the next candidate
+        except Exception as e:  # noqa: BLE001 - try the next candidate
             last_err = e
-            _log.warning("model %r failed for @%s: %s — trying next candidate",
+            _log.warning("model %r failed for @%s: %s - trying next candidate",
                          cand, merchant.handle, e)
             continue
 

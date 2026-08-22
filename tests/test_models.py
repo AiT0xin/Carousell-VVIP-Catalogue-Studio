@@ -1,4 +1,4 @@
-"""Catalogue data models — category colours and merchant readiness."""
+"""Catalogue data models - category colours and merchant readiness."""
 from catbuilder.models import (
     MerchantData,
     CatalogueSection,

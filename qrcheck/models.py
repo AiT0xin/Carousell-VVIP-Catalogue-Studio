@@ -28,7 +28,7 @@ class ReasonCode(str, Enum):
 
 class QRClass(str, Enum):
     MERCHANT = "merchant"     # carousell.sg/u/<handle> profile link (direct)
-    SHORTLINK = "shortlink"   # caro.sl/... — destination unknown until resolved
+    SHORTLINK = "shortlink"   # caro.sl/... - destination unknown until resolved
     CTA = "cta"               # category / WhatsApp / info redirect, not a profile
 
 

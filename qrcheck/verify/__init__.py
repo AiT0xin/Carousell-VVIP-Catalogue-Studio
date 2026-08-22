@@ -1,4 +1,4 @@
-"""Stage 3b — resolve a decoded URL and prove it renders a live merchant profile.
+"""Stage 3b - resolve a decoded URL and prove it renders a live merchant profile.
 
 The package is platform-pluggable: `get_verifier(platform)` returns a Verifier.
 Today only Carousell is implemented, but the interface (resolve -> render ->

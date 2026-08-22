@@ -181,7 +181,7 @@ def _fit_crop_buf(img_path: Path, w: int, h: int) -> Optional[io.BytesIO]:
 
 # ── Drawing helpers ────────────────────────────────────────────────────────────
 
-# Smart punctuation the embedded fonts have no glyph for — LLM output loves
+# Smart punctuation the embedded fonts have no glyph for - LLM output loves
 # non-breaking hyphens and em-dashes, which otherwise render as a tofu box.
 _PUNCT_MAP = {
     "‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-",
@@ -202,7 +202,7 @@ def _ascii(text: str) -> str:
     for k, v in _PUNCT_MAP.items():
         if k in text:
             text = text.replace(k, v)
-    # Drop remaining high-plane symbols / dingbats / emoji (e.g. a stray ✅).
+    # Drop remaining high-plane symbols / dingbats / emoji (e.g. a stray check mark).
     return "".join(ch for ch in text if ord(ch) < 0x2100)
 
 
@@ -454,7 +454,7 @@ def _draw_card(
             max_lines=3, line_height=11.0,
         )
     else:
-        # No product images — use that whole region for the description text
+        # No product images - use that whole region for the description text
         # (starts just under the identity divider and flows down the card).
         c.setFont(REG, 8.5)
         c.setFillColor(_GREY)

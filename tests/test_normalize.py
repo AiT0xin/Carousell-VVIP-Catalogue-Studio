@@ -1,4 +1,4 @@
-"""Handle / URL normalization and classification — the single source of truth
+"""Handle / URL normalization and classification - the single source of truth
 for "is this a profile link and, if so, whose?"."""
 from qrcheck.normalize import (
     normalize_handle,

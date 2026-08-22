@@ -1,4 +1,4 @@
-"""Cross-check core — fuzzy VVIP matching and the summary tally.
+"""Cross-check core - fuzzy VVIP matching and the summary tally.
 
 The network-bound run_crosscheck() (which drives PDF extraction) is exercised
 manually; here we pin the pure logic it depends on."""

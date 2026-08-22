@@ -1,12 +1,12 @@
-"""Feature 3 — generate the corrected catalogue.
+"""Feature 3 - generate the corrected catalogue.
 
 Takes the loaded catalogue's merchant set, applies the *approved* changes from
 Features 1 & 2, and renders the next edition:
 
     final = (in-catalogue VVIPs)  −  approved removals  +  approved additions
 
-Every card is rebuilt fresh — profile re-fetched, description regenerated, and a
-new QR minted from the canonical profile URL — so any broken QR flagged in
+Every card is rebuilt fresh - profile re-fetched, description regenerated, and a
+new QR minted from the canonical profile URL - so any broken QR flagged in
 Feature 2 is corrected by construction. Profiles that no longer resolve are
 skipped and reported rather than printed as dead cards.
 """
@@ -54,7 +54,7 @@ def build_final_handles(session: StudioSession) -> list[str]:
 
 
 def _fallback_description(m: MerchantData) -> str:
-    """Build a description from scraped profile data — no AI needed."""
+    """Build a description from scraped profile data - no AI needed."""
     import json
     from pathlib import Path as _P
 
@@ -161,7 +161,7 @@ def generate(
         else:
             m.description = _fallback_description(m)
 
-        # Always mint a fresh QR from the canonical profile URL — this is what
+        # Always mint a fresh QR from the canonical profile URL - this is what
         # fixes every broken QR flagged in Feature 2.
         m.qr_path = generate_qr(m, cache_dir)
         merchants.append(m)

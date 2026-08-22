@@ -1,4 +1,4 @@
-"""AI description helpers — provider gating, sparseness, prompt building, and
+"""AI description helpers - provider gating, sparseness, prompt building, and
 the DuckDuckGo snippet parser. No network is touched (the LLM call itself is
 integration-tested manually)."""
 from catbuilder.describer import (
@@ -11,7 +11,7 @@ from catbuilder.describer import (
 )
 from catbuilder.models import MerchantData
 
-# The real hallucination that shipped for @81.aircon — an image caption of a
+# The real hallucination that shipped for @81.aircon - an image caption of a
 # random photo instead of a description of the aircon business. Kept as a
 # regression fixture so the guardrail can never let it through again.
 _HALLUCINATION = (
@@ -76,7 +76,7 @@ def test_guardrail_accepts_a_real_description():
     m = MerchantData(handle="81.aircon", display_name="81.Aircon", category="Services")
     tokens = _grounding_tokens(m, _AIRCON_BIO, [])
     good = ("81.Aircon offers aircon setup, servicing, and old-unit removal with "
-            "complimentary site checks — message them to book.")
+            "complimentary site checks - message them to book.")
     assert _is_grounded(good, tokens) is True
 
 

@@ -2,7 +2,7 @@
 
 Kept separate from app.py so it is unit-testable and reusable. The Streamlit
 process is launched via `sh -c` (see .claude/launch.json and the deploy runner),
-which does NOT source ~/.zshrc — so shell exports never reach it. Reading a
+which does NOT source ~/.zshrc - so shell exports never reach it. Reading a
 gitignored .env here bridges that gap without leaking secrets.
 
 Existing real environment variables always win, so a shell export or a hosting

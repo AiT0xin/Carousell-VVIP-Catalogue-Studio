@@ -1,4 +1,4 @@
-"""Stage 2 — extract QR codes and printed handles from a catalogue PDF and pair
+"""Stage 2 - extract QR codes and printed handles from a catalogue PDF and pair
 each QR with its handle.
 
 Design notes (validated against the real Carousell VVIP catalogues):
@@ -6,10 +6,10 @@ Design notes (validated against the real Carousell VVIP catalogues):
   * pdfplumber word boxes share that coordinate space, so QR boxes (converted
     from pixels by dividing by scale) and handle boxes are directly comparable.
   * Decoding is a *union* across several render scales and two decoders
-    (pyzbar primary, OpenCV fallback). Single-pass decoding misses codes — this
+    (pyzbar primary, OpenCV fallback). Single-pass decoding misses codes - this
     union is the single biggest reliability lever.
   * Pairing: for each QR, restrict candidate handles to the same page column
-    (same side of the page midline — required for 2-up landscape spreads), then
+    (same side of the page midline - required for 2-up landscape spreads), then
     pick the handle whose vertical center is nearest the QR's. Measured against
     the samples, this pairs every QR correctly.
 """
@@ -136,8 +136,8 @@ def pair_qrs_to_handles(qrs: list[DecodedQR], handles: list[PrintedHandle],
                         page_width: float):
     """Return (rows, unpaired_handles).
 
-    Pairing is purely *geometric* and covers every QR — merchant, shortlink, and
-    CTA alike — because at extract time a caro.sl shortlink looks like a CTA but
+    Pairing is purely *geometric* and covers every QR - merchant, shortlink, and
+    CTA alike - because at extract time a caro.sl shortlink looks like a CTA but
     is usually a merchant card's QR. We pair first, classify after resolution.
     Candidate QR/handle pairs are sorted by vertical distance within the same
     column and consumed best-first, so each handle backs at most one QR.

@@ -1,4 +1,4 @@
-"""SSRF guard — the security-critical gate on every live QR fetch.
+"""SSRF guard - the security-critical gate on every live QR fetch.
 
 A QR is decoded from an attacker-controlled PDF, so is_verifiable_url() is the
 only thing standing between "verify this link" and a server-side fetch of an

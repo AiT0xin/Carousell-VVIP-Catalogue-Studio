@@ -1,11 +1,11 @@
-"""Feature 2 — QR check.
+"""Feature 2 - QR check.
 
 For every merchant card in the catalogue, prove its QR is trustworthy:
 
-  1. decode-match  — the handle encoded in the QR equals the handle printed on
+  1. decode-match  - the handle encoded in the QR equals the handle printed on
                      the card
-  2. live          — the link resolves to a *live* profile (not a 404)
-  3. right page    — it lands on the printed merchant, not a renamed/blank shell
+  2. live          - the link resolves to a *live* profile (not a 404)
+  3. right page    - it lands on the printed merchant, not a renamed/blank shell
                      (the "soft-404": a page that loads but isn't the merchant)
 
 Each card ends up with one status:
@@ -120,7 +120,7 @@ def _http_verify(url: str) -> dict:
         # Follow redirects *manually* and re-validate every hop. A Carousell
         # shortlink (caro.sl) legitimately redirects to a profile, but auto-
         # following would let a single allowed hop bounce the request off to an
-        # internal target — so each Location must itself pass _is_verifiable_url.
+        # internal target - so each Location must itself pass _is_verifiable_url.
         with httpx.Client(follow_redirects=False, timeout=20,
                           headers={"User-Agent": _UA}) as client:
             resp = client.get(url)
@@ -156,10 +156,10 @@ def _http_verify(url: str) -> dict:
 
 def _live_verify_inline(targets: list[MerchantRecord],
                         progress_cb: Optional[Callable] = None) -> dict[str, dict]:
-    """HTTP-based verification — no subprocess, no browser, works in any sandbox.
+    """HTTP-based verification - no subprocess, no browser, works in any sandbox.
 
     Live verification is the slow part (a throttled HTTP request per card), so it
-    drives the progress bar directly — otherwise the bar would sit at 0% for the
+    drives the progress bar directly - otherwise the bar would sit at 0% for the
     whole check and only jump at the end.
     """
     results: dict[str, dict] = {}
@@ -186,7 +186,7 @@ def run_qrcheck(
 
     session.clear_changes("qrcheck")
 
-    # ── Live verification (drives the progress bar — the slow phase) ─────────
+    # ── Live verification (drives the progress bar - the slow phase) ─────────
     live_results: dict[str, dict] = {}
     if do_live:
         live_results = _live_verify_inline(targets, progress_cb=progress_cb)

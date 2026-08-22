@@ -1,4 +1,4 @@
-"""QR verdict logic — turns (extraction + live-verify + master) into a reason
+"""QR verdict logic - turns (extraction + live-verify + master) into a reason
 code. This is the heart of Feature 2, so every branch is pinned here."""
 from qrcheck.models import ExtractedRow, VerifyResult, QRClass, ReasonCode
 from qrcheck.verdict import decide, _similar, _in_master
@@ -71,6 +71,6 @@ def test_similar_helper():
 
 
 def test_in_master_helper():
-    assert _in_master("foo", set()) == "—"      # em dash when no master
+    assert _in_master("foo", set()) == "-"      # em dash when no master
     assert _in_master("", {"x"}) == "No"
     assert _in_master("Foo", {"foo"}) == "Yes"        # normalizes before lookup

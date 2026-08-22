@@ -3,19 +3,19 @@ single per-QR ReportRow with a reason_code.
 
 The tricky calls and how we make them:
 
-  HANDLE_TYPO vs MISMATCH — both mean "QR username != printed handle". They
+  HANDLE_TYPO vs MISMATCH - both mean "QR username != printed handle". They
     differ in *why*:
       * HANDLE_TYPO: the printed slug is itself dead, and the QR lands on a live
         near-spelling of it. The QR is right; the printed text is the typo.
       * MISMATCH: the printed slug is a live (different) merchant, or the QR
         target is unrelated. The QR points somewhere it shouldn't.
     We can only tell these apart by *also* verifying the printed handle's own
-    profile — hence the orchestrator verifies both URLs and passes both here.
+    profile - hence the orchestrator verifies both URLs and passes both here.
 
-  DEAD_LINK vs RENAMED_HANDLE — both 200-ish but not a usable profile:
+  DEAD_LINK vs RENAMED_HANDLE - both 200-ish but not a usable profile:
       * DEAD_LINK: nothing renders / 404 / bounce.
       * RENAMED_HANDLE: a profile *shell* renders but it's an empty placeholder
-        (0 listings, not verified) — the classic renamed-and-orphaned slug.
+        (0 listings, not verified) - the classic renamed-and-orphaned slug.
 """
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ def decide(row: ExtractedRow,
     if not row.decoded_url:
         rr.reason_code = ReasonCode.DECODE_FAIL
         rr.qr_status = "no-decode"
-        rr.match_status = "—"
+        rr.match_status = "-"
         rr.in_master = _in_master(printed, master_handles)
         return rr
 
@@ -70,7 +70,7 @@ def decide(row: ExtractedRow,
                                            and dest is None and qr_result.qr_status not in ("dead", "blank-shell", "blank", "error")):
             rr.reason_code = ReasonCode.CTA_OK
             rr.match_status = "n/a (CTA)"
-            rr.in_master = "—"
+            rr.in_master = "-"
             return rr
 
     # --- QR did not render a live profile --------------------------------- #
@@ -110,7 +110,7 @@ def decide(row: ExtractedRow,
 
 def _in_master(handle: str, master_handles: set[str]) -> str:
     if not master_handles:
-        return "—"
+        return "-"
     if not handle:
         return "No"
     return "Yes" if normalize_handle(handle) in master_handles else "No"

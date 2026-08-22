@@ -1,4 +1,4 @@
-"""Shared SSRF guard for QR live-verification — single source of truth.
+"""Shared SSRF guard for QR live-verification - single source of truth.
 
 A QR decoded out of an uploaded PDF is fully attacker-controlled, so before the
 live check ever dereferences a decoded URL it must pass through here. Without
@@ -7,7 +7,7 @@ endpoints, or localhost admin ports. A QR that points anywhere off the Carousell
 ecosystem isn't a valid merchant link anyway, so callers flag it "dead" rather
 than fetching it.
 
-The QR verifier (studio/qr.py) imports from here — the one place the allowlist
+The QR verifier (studio/qr.py) imports from here - the one place the allowlist
 and its matching logic are defined, so there is no second copy to drift out of
 sync. Kept dependency-light (stdlib only) so any caller stays cheap to import.
 """
@@ -26,7 +26,7 @@ ALLOWED_VERIFY_DOMAINS = (
 
 
 def is_verifiable_url(url: str) -> bool:
-    """True only for http(s) URLs on a known Carousell host — blocks SSRF.
+    """True only for http(s) URLs on a known Carousell host - blocks SSRF.
 
     Matches a base domain exactly or as a proper subdomain (``host == domain``
     or ``host.endswith("." + domain)``), so lookalikes like ``evilcarousell.sg``

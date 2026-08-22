@@ -3,7 +3,7 @@
 The resolver (cheap, no browser) follows redirects so we learn a shortlink's
 destination and catch obviously-dead links before paying for a headless render.
 The browser render (subclass responsibility) is what actually proves a *live*
-profile — an HTTP 200 is explicitly *not* a pass (a renamed/deleted handle still
+profile - an HTTP 200 is explicitly *not* a pass (a renamed/deleted handle still
 200s with a blank shell).
 """
 from __future__ import annotations

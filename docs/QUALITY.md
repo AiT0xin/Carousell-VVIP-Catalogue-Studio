@@ -1,22 +1,22 @@
-# Quality Management — VVIP Catalogue Studio
+# Quality Management - VVIP Catalogue Studio
 
 This document is the project's lightweight Quality Management System (QMS),
 mapping the relevant ISO 9001:2015 clauses onto how this codebase is actually
 built and released. It is deliberately proportionate to a single-maintainer
-tool — the goal is real assurance, not paperwork.
+tool - the goal is real assurance, not paperwork.
 
 Related records:
-- [REQUIREMENTS.md](REQUIREMENTS.md) — what the product must do + how each item is verified (clause 8.2 / 8.3)
-- [NONCONFORMITY_LOG.md](NONCONFORMITY_LOG.md) — defects, audit findings, and their disposition (clause 10.2)
+- [REQUIREMENTS.md](REQUIREMENTS.md) - what the product must do + how each item is verified (clause 8.2 / 8.3)
+- [NONCONFORMITY_LOG.md](NONCONFORMITY_LOG.md) - defects, audit findings, and their disposition (clause 10.2)
 
 ## Quality policy (clause 5.2)
 
 VVIP Catalogue Studio exists to make Carousell VVIP e-catalogues **correct and
-trustworthy** — every merchant that should be in is in, every QR resolves to the
+trustworthy** - every merchant that should be in is in, every QR resolves to the
 right live profile, and nothing is shipped that hasn't been verified. Quality is
 maintained by keeping the verification automatic (not dependent on the
 maintainer remembering), keeping the code documented, and recording defects so
-causes — not just symptoms — get fixed.
+causes - not just symptoms - get fixed.
 
 ## Quality objectives (clause 6.2)
 
@@ -33,9 +33,9 @@ Measurable, reviewed whenever the audit is re-run:
 
 The product is a three-stage pipeline, mirrored by the package layout:
 
-1. **Cross-check** (`studio/crosscheck.py`) — catalogue vs master → add / remove
-2. **QR check** (`studio/qr.py`, `qrcheck/`) — every QR decodes, is live, lands right
-3. **Generate** (`studio/generate.py`, `catbuilder/`) — apply approved changes → corrected PDF
+1. **Cross-check** (`studio/crosscheck.py`) - catalogue vs master → add / remove
+2. **QR check** (`studio/qr.py`, `qrcheck/`) - every QR decodes, is live, lands right
+3. **Generate** (`studio/generate.py`, `catbuilder/`) - apply approved changes → corrected PDF
 
 `studio/sources.py` is the single wiring point to the two engine packages.
 

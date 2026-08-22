@@ -1,9 +1,9 @@
-"""Stage 3a — coverage: set-diff the handles present in the catalogue/sheet
+"""Stage 3a - coverage: set-diff the handles present in the catalogue/sheet
 against the master document.
 
 Produces extra ReportRows for handles that are out of coverage:
-  * NOT_IN_MASTER      — in the catalogue/sheet but absent from the master
-  * MISSING_FROM_SHEET — in the master but never seen in the catalogue/sheet
+  * NOT_IN_MASTER      - in the catalogue/sheet but absent from the master
+  * MISSING_FROM_SHEET - in the master but never seen in the catalogue/sheet
 These are independent of QR integrity (a QR can pass while its merchant is still
 missing from the master).
 """

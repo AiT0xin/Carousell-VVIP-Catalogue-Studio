@@ -1,8 +1,8 @@
 # Requirements register
 
 The product requirements for VVIP Catalogue Studio, each with acceptance
-criteria and the verification that covers it (ISO 9001 clause 8.2 — determining
-and reviewing requirements; clause 8.3 — design traceability). "Verified by"
+criteria and the verification that covers it (ISO 9001 clause 8.2 - determining
+and reviewing requirements; clause 8.3 - design traceability). "Verified by"
 names an automated test where one exists, or "manual / integration" where the
 step needs a real PDF, browser, or network and is checked by hand.
 
