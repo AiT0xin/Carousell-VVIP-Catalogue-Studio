@@ -3,6 +3,8 @@
 One app, three features, for maintaining Carousell VVIP merchant e-catalogues.
 
 ![VVIP Catalogue Studio](docs/preview.png)
+<img width="8280" height="3864" alt="diagram" src="https://github.com/user-attachments/assets/9b1209ed-182b-418a-a250-187599fda242" />
+
 
 ## Setup
 
